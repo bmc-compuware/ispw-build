@@ -80,7 +80,7 @@ function run() {
             inputs = ['build_automatically', 'assignment_id', 'level', 'task_id', 'ces_url',
                 'ces_token', 'srid', 'runtime_configuration', 'change_type', 'execution_status', 'auto_deploy'];
             inputs = utils.retrieveInputs(core, inputs);
-            core.debug('ISPW: parsed inputs: ' + utils.convertObjectToJson(inputs));
+            console.log('ISPW: parsed inputs: ' + utils.convertObjectToJson(inputs));
             return [2 /*return*/];
         });
     });

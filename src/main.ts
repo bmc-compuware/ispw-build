@@ -17,5 +17,5 @@ export async function run() {
         'ces_token', 'srid', 'runtime_configuration', 'change_type', 'execution_status', 'auto_deploy'];
     inputs = utils.retrieveInputs(core, inputs);
 
-    core.debug('ISPW: parsed inputs: ' + utils.convertObjectToJson(inputs));
+    console.log('ISPW: parsed inputs: ' + utils.convertObjectToJson(inputs));
 }
