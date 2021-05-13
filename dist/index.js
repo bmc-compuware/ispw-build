@@ -75,21 +75,21 @@ var core = __importStar(__nccwpck_require__(2186));
 var utils = __nccwpck_require__(2045);
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var buildAuto, inputs, buildParms;
+        var buildAuto, inputs, buildParms, buildAuto_1;
         return __generator(this, function (_a) {
             inputs = ['build_automatically', 'application', 'assignment_id', 'level', 'mname', 'mtype', 'task_id', 'ces_url',
                 'ces_token', 'srid', 'runtime_configuration', 'change_type', 'execution_status'];
             inputs = utils.retrieveInputs(core, inputs);
             core.debug('ISPW: parsed inputs: ' + utils.convertObjectToJson(inputs));
-            buildParms = JSON.parse(utils.convertObjectToJson(inputs));
+            buildParms = utils.parseStringAsJson((utils.convertObjectToJson(inputs)));
             core.debug("1: url=" + buildParms.ces_url + ', runtime=' + buildParms.runtime_configuration
                 + ', srid=' + buildParms.srid + ', typeof=' + typeof (buildParms.build_automatically + ', auto=' + buildParms.build_automatically));
             if (utils.stringHasContent(buildParms.build_automatically)) {
                 console.log('Generate parameters are being retrieved from the ' +
                     'generate_automatically input.');
-                //buildParms = utils.parseStringAsJson(inputs.build_automatically);
-                buildAuto = buildParms.build_automatically;
-                console.debug('buildAuto=', utils.convertObjectToJson(buildAuto));
+                buildAuto_1 = utils.parseStringAsJson(buildParms.build_automatically);
+                console.debug('2: buildAuto=', utils.convertObjectToJson(buildAuto_1));
+                console.debug(buildAuto_1.containerId + ',typeof=' + typeof (buildAuto_1.taskIds) + ', length=' + buildAuto_1.taskIds[0]);
             }
             else {
                 console.log('Generate parameters are being retrieved from the inputs.');
