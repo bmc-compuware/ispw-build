@@ -81,7 +81,7 @@ function run() {
                 'ces_token', 'srid', 'runtime_configuration', 'change_type', 'execution_status'];
             inputs = utils.retrieveInputs(core, inputs);
             core.debug('ISPW: parsed inputs: ' + utils.convertObjectToJson(inputs));
-            buildParms = utils.convertObjectToJson(inputs);
+            buildParms = JSON.parse(utils.convertObjectToJson(inputs));
             core.debug("1: url=" + buildParms.ces_url + ', runtime=' + buildParms.runtime_configuration
                 + ', srid=' + buildParms.srid + ', typeof=' + typeof (buildParms.build_automatically + ', auto=' + buildParms.build_automatically));
             if (utils.stringHasContent(buildParms.build_automatically)) {

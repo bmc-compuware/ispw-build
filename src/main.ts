@@ -22,7 +22,7 @@ export async function run() {
 
     core.debug('ISPW: parsed inputs: ' + utils.convertObjectToJson(inputs));
 
-    let buildParms : BuildParms = utils.convertObjectToJson(inputs) ;
+    let buildParms : BuildParms = JSON.parse(utils.convertObjectToJson(inputs)) ;
     core.debug("1: url="+ buildParms.ces_url+', runtime='+buildParms.runtime_configuration
         +', srid='+buildParms.srid+', typeof='+typeof(buildParms.build_automatically+', auto='+buildParms.build_automatically))
     if (utils.stringHasContent(buildParms.build_automatically)) {
