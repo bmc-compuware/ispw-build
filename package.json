@@ -21,9 +21,9 @@
   },
   "homepage": "https://github.com/bmc-compuware/ispw-build#readme",
   "dependencies": {
+    "@bmc-compuware/ispw-action-utilities": "^1.0.0",
     "@actions/core": "^1.2.7",
     "@actions/github": "^4.0.0",
-    "@bmc-compuware/ispw-action-utilities": "^1.0.0",
     "path": "^0.12.7"
   },
   "devDependencies": {
