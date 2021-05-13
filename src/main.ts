@@ -23,7 +23,7 @@ export async function run() {
     core.debug('ISPW: parsed inputs: ' + utils.convertObjectToJson(inputs));
 
     buildParms = utils.convertObjectToJson(inputs);
-    core.debug("1: ", buildParms.ces_url, buildParms.runtime_configuration, buildParms.srid, buildParms.build_automatically)
+    core.debug("1: "+ buildParms.ces_url+buildParms.runtime_configuration+buildParms.srid+buildParms.build_automatically)
     if (utils.stringHasContent(buildParms.build_automatically)) {
         console.log('Generate parameters are being retrieved from the ' +
             'generate_automatically input.');
