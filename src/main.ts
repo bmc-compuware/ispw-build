@@ -14,7 +14,7 @@ const utils = require('@bmc-compuware/ispw-action-utilities');
 
 export async function run() {
 
-    let buildAuto : BuildAuto | undefined;
+    let buildAuto : BuildAuto | any = undefined;
 
     let inputs = ['build_automatically', 'application', 'assignment_id', 'level', 'mname', 'mtype', 'task_id', 'ces_url',
         'ces_token', 'srid', 'runtime_configuration', 'change_type', 'execution_status'];
@@ -29,7 +29,7 @@ export async function run() {
         console.log('Generate parameters are being retrieved from the ' +
             'generate_automatically input.');
         //buildParms = utils.parseStringAsJson(inputs.build_automatically);
-        let buildAuto: BuildAuto = utils.parseStringAsJson(buildParms.build_automatically);
+        buildAuto = utils.parseStringAsJson(buildParms.build_automatically);
         console.debug('2: buildAuto=', utils.convertObjectToJson(buildAuto))
         console.debug(buildAuto.containerId+',typeof='+typeof(buildAuto.taskIds)+', length='+buildAuto.taskIds[0]);
     } else {
@@ -39,5 +39,11 @@ export async function run() {
     }
 
     core.debug('ISPW: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
+
+    if( typeof(buildAuto) != undefined ) {
+        core.debug("let's build auto");
+    } else {
+        core.debug("let's NOT build auto")
+    }
 }
 

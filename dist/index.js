@@ -75,8 +75,9 @@ var core = __importStar(__nccwpck_require__(2186));
 var utils = __nccwpck_require__(2045);
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var buildAuto, inputs, buildParms, buildAuto_1;
+        var buildAuto, inputs, buildParms;
         return __generator(this, function (_a) {
+            buildAuto = undefined;
             inputs = ['build_automatically', 'application', 'assignment_id', 'level', 'mname', 'mtype', 'task_id', 'ces_url',
                 'ces_token', 'srid', 'runtime_configuration', 'change_type', 'execution_status'];
             inputs = utils.retrieveInputs(core, inputs);
@@ -87,9 +88,10 @@ function run() {
             if (utils.stringHasContent(buildParms.build_automatically)) {
                 console.log('Generate parameters are being retrieved from the ' +
                     'generate_automatically input.');
-                buildAuto_1 = utils.parseStringAsJson(buildParms.build_automatically);
-                console.debug('2: buildAuto=', utils.convertObjectToJson(buildAuto_1));
-                console.debug(buildAuto_1.containerId + ',typeof=' + typeof (buildAuto_1.taskIds) + ', length=' + buildAuto_1.taskIds[0]);
+                //buildParms = utils.parseStringAsJson(inputs.build_automatically);
+                buildAuto = utils.parseStringAsJson(buildParms.build_automatically);
+                console.debug('2: buildAuto=', utils.convertObjectToJson(buildAuto));
+                console.debug(buildAuto.containerId + ',typeof=' + typeof (buildAuto.taskIds) + ', length=' + buildAuto.taskIds[0]);
             }
             else {
                 console.log('Generate parameters are being retrieved from the inputs.');
@@ -97,6 +99,12 @@ function run() {
                 console.debug('buildParms=', utils.convertObjectToJson(buildParms));
             }
             core.debug('ISPW: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
+            if (typeof (buildAuto) != undefined) {
+                core.debug("let's build auto");
+            }
+            else {
+                core.debug("let's NOT build auto");
+            }
             return [2 /*return*/];
         });
     });
