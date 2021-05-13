@@ -23,14 +23,14 @@ export async function run() {
     core.debug('ISPW: parsed inputs: ' + utils.convertObjectToJson(inputs));
 
     buildParms = utils.convertObjectToJson(inputs);
-
+    core.debug("1: ", buildParms.ces_url, buildParms.runtime_configuration, buildParms.srid, buildParms.build_automatically)
     if (utils.stringHasContent(buildParms.build_automatically)) {
         console.log('Generate parameters are being retrieved from the ' +
             'generate_automatically input.');
         //buildParms = utils.parseStringAsJson(inputs.build_automatically);
         buildAuto = buildParms.build_automatically
         console.debug('buildAuto=', utils.convertObjectToJson(buildAuto))
-        
+
     } else {
         console.log('Generate parameters are being retrieved from the inputs.');
         //buildParms = getParmsFromInputs(inputs.assignment_id, inputs.level, inputs.task_id);
