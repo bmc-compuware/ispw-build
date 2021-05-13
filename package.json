@@ -1,20 +1,26 @@
 {
   "name": "ispw-build",
   "version": "1.0.0",
-  "description": "",
-  "main": "dist/index.js",
+  "description": "ISPW github action build",
+  "main": "lib/ispw-build.js",
   "scripts": {
-    "build": "tsc && ncc build --source-map --license licenses.txt",
-    "lint": "npx eslint . --ext .js,.ts",
-    "test": "nyc --all=true --exclude=\"dist/**\" --exclude=\"coverage/**\" --exclude=\"test/**\" --reporter=json --reporter=text mocha",
-    "check": "npm run lint && npm run build && npm run test"
+    "build": "tsc && ncc build",
+    "format": "prettier --write **/*.ts",
+    "format-check": "prettier --check **/*.ts",
+    "test": "jest",
+    "pre-checkin": "npm run format && npm run build && npm test"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bmc-compuware/ispw-build.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "ISPW",
+    "ispw-build",
+    "BMC",
+    "Compuware"
+  ],
+  "author": "BMC Compuware",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/bmc-compuware/ispw-build/issues"
@@ -27,18 +33,14 @@
     "path": "^0.12.7"
   },
   "devDependencies": {
-    "@types/node": "^15.0.3",
-    "@typescript-eslint/eslint-plugin": "^4.23.0",
-    "@typescript-eslint/parser": "^4.23.0",
+    "@types/jest": "^24.0.13",
+    "@types/node": "^12.0.4",
+    "@types/semver": "^6.0.0",
     "@vercel/ncc": "^0.28.5",
-    "chai": "^4.3.4",
-    "eslint": "^7.25.0",
-    "eslint-config-google": "^0.14.0",
-    "esm": "^3.2.25",
-    "mocha": "^8.3.2",
-    "nock": "^13.0.11",
-    "npx": "^10.2.2",
-    "nyc": "^15.1.0",
-    "typescript": "^4.2.4"
+    "jest": "^24.9.0",
+    "jest-circus": "^24.7.1",
+    "prettier": "^1.19.1",
+    "ts-jest": "^24.3.0",
+    "typescript": "^3.8.3"
   }
 }
