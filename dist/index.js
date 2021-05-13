@@ -87,9 +87,7 @@ function run() {
                     'generate_automatically input.');
                 //buildParms = utils.parseStringAsJson(inputs.build_automatically);
                 buildAuto = buildParms.build_automatically;
-                if (buildAuto) {
-                    console.debug('buildAuto=', utils.convertObjectToJson(buildAuto));
-                }
+                console.debug('buildAuto=', utils.convertObjectToJson(buildAuto));
             }
             else {
                 console.log('Generate parameters are being retrieved from the inputs.');
