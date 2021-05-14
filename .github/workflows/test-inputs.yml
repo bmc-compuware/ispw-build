@@ -12,7 +12,7 @@ on:  # Triggers the workflow on push or pull request events but only for the mai
 jobs:
   generate:
     name: Running build
-    runs-on: [self-hosted, Windows, X64]
+    runs-on: ubuntu-latest
     steps:
       - name: build
         uses: bmc-compuware/ispw-build@main
