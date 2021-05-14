@@ -198,7 +198,7 @@ function getGenerateAwaitUrlPath(buildParms: BuildParms) {
             tempUrlStr = tempUrlStr.concat(`taskId=${id}&`);
         });
     } else {
-        core.setFailed('Failed to parse task ids from input');
+        core.setFailed('Failed to parse task ids from input.');
     }
 
     tempUrlStr = tempUrlStr.concat(`level=${buildParms.level}`);
