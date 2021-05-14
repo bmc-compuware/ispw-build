@@ -1,3 +1,4 @@
+
 /**
 * ALL BMC SOFTWARE PRODUCTS LISTED WITHIN THE MATERIALS ARE TRADEMARKS OF BMC SOFTWARE, INC. ALL OTHER COMPANY PRODUCT NAMES
 * ARE TRADEMARKS OF THEIR RESPECTIVE OWNERS.
@@ -5,9 +6,9 @@
 * (c) Copyright 2021 BMC Software, Inc.
 * This code is licensed under MIT license (see LICENSE.txt for details)
 */
-
-import { BuildAuto } from '../src/types/BuildAuto';
-import { BuildParms } from '../src/types/BuildParms';
+import { CesRequestBody } from './types/CesRequestBody';
+import { BuildAuto } from './types/BuildAuto';
+import { BuildParms } from './types/BuildParms';
 
 const main = require('../src/main');
 
@@ -28,7 +29,7 @@ describe('entity tests', () => {
         expect(buildParms.execution_status).toBe('E');
         expect(buildParms.change_type).toBe('T');
         expect(buildParms.srid).toBe('srid1');
-    })
+    });
 
     it('buildauto', async () => {
         let buildAuto: BuildAuto = { "containerId": "PLAY004799", "releaseId": " ", "taskLevel": "DEV2", "taskIds": ["7E53CC8FB3D6", "7E53CC8FB3D7"] };
@@ -38,4 +39,12 @@ describe('entity tests', () => {
         expect(buildAuto.taskIds[0]).toBe('7E53CC8FB3D6');
         expect(buildAuto.taskIds[1]).toBe('7E53CC8FB3D7');
     })
+
+    it('cesrequestbody', async () => {
+        let requestBody: CesRequestBody = { "runtimeConfiguration": "TPZP", "changeType": "S", "execStatus": "I" };
+        expect(requestBody.changeType).toBe('S');
+        expect(requestBody.execStatus).toBe('I');
+        expect(requestBody.runtimeConfiguration).toBe('TPZP');
+    })
+    
 })

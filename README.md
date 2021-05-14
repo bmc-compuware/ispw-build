@@ -72,8 +72,8 @@ jobs:
 | `ces_url` | Required | The URL to use when connecting to CES |
 | `ces_token` | Required | The token to use when authenticating the request to CES |
 | `srid` | Required | The SRID of the ISPW instance to connect to |
-| `change_type` | Required | The change type of this request. The default value is 'S' for standard. |
-| `execution_status` | Required | The flag to indicate whether the build should happen immediately, or should be held. The default is 'I' for immediate. Other possible value is 'H' for hold. |
+| `change_type` | Optional | The change type of this request. The default value is 'S' for standard. |
+| `execution_status` | Optional | The flag to indicate whether the build should happen immediately, or should be held. The default is 'I' for immediate. Other possible value is 'H' for hold. |
 | `runtime_configuration` | Optional | The runtime configuration for the instance of ISPW you are connecting to. |
 | `build_automatically` | Optional | A string of JSON that contains the parameters for the build. If using an ispw-sync or ispw-sync-local step before the build, this JSON string can be retrieved from the outputs of that step. If `build_automatically` is not being used, then the task_id must be specified. |
 | `task_id` | Optional | The comma-separated string of task IDs for the tasks that need to be built. Do not use if `build_automatically` has already been specified.|
