@@ -1,4 +1,3 @@
-import { CesRequestBody } from './types/CesRequestBody';
 /**
 * ALL BMC SOFTWARE PRODUCTS LISTED WITHIN THE MATERIALS ARE TRADEMARKS OF BMC
 * SOFTWARE, INC. ALL OTHER COMPANY PRODUCT NAMES ARE TRADEMARKS OF THEIR
@@ -7,11 +6,11 @@ import { CesRequestBody } from './types/CesRequestBody';
 * (c) Copyright 2021 BMC Software, Inc.
 * This code is licensed under MIT license (see LICENSE.txt for details)
 */
-
 import * as core from '@actions/core';
 import { URL } from 'url';
 import { BuildAuto } from './types/BuildAuto';
 import { BuildParms } from './types/BuildParms';
+import { CesRequestBody } from './types/CesRequestBody';
 import { CommonUtils } from './utils/CommonUtils';
 
 const utils = require('@bmc-compuware/ispw-action-utilities');
@@ -199,7 +198,7 @@ function getGenerateAwaitUrlPath(buildParms: BuildParms) {
             tempUrlStr = tempUrlStr.concat(`taskId=${id}&`);
         });
     } else {
-        core.setFailed('Failed to parse task ids from input.');
+        core.setFailed('Failed to parse task ids from input');
     }
 
     if (CommonUtils.isNotBlank(buildParms.level)) {

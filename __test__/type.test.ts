@@ -14,16 +14,12 @@ const main = require('../src/main');
 describe('entity tests', () => {
     it('buildparms', async () => {
         let buildParms: BuildParms = {
-            "build_automatically": "build_automatically", "application": "PLAY", "assignment_id": "PLAY004799",
-            "level": "DEV1", "mname": "TPROG01", "mtype": "COB", "task_id": "7E53CC8FB3D6, 7E53CC8FB3D6, 7E53CC8FB3D6",
+            "build_automatically": "build_automatically",
+            "level": "DEV1", "task_id": "7E53CC8FB3D6, 7E53CC8FB3D6, 7E53CC8FB3D6",
             "ces_url": "http://localhost:48226/", "ces_token": "token1", "srid": "srid1", "runtime_configuration": "ISPW",
             "change_type": "T", "execution_status": "E"
         };
-        expect(buildParms.application).toBe('PLAY');
-        expect(buildParms.assignment_id).toBe('PLAY004799');
         expect(buildParms.level).toBe('DEV1');
-        expect(buildParms.mtype).toBe('COB');
-        expect(buildParms.mname).toBe('TPROG01');
         expect(buildParms.task_id).toBe('7E53CC8FB3D6, 7E53CC8FB3D6, 7E53CC8FB3D6');
         expect(buildParms.runtime_configuration).toBe('ISPW');
         expect(buildParms.build_automatically).toBe('build_automatically');
