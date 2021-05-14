@@ -14,7 +14,6 @@ import { BuildAuto } from './types/BuildAuto';
 import { BuildParms } from './types/BuildParms';
 
 const utils = require('@bmc-compuware/ispw-action-utilities');
-const axios = require('axios').default;
 
 export async function run() {
     try {
@@ -36,6 +35,7 @@ export async function run() {
 
             if (buildAuto.taskIds) {
                 buildParms.task_id = buildAuto.taskIds.join(',')
+                buildParms.level = buildAuto.taskLevel;
             }
         } else {
             console.log('Build parameters are being retrieved from the inputs.');
@@ -57,13 +57,12 @@ export async function run() {
         const reqBodyObj = assembleRequestBodyObject(buildParms.runtime_configuration, buildParms.change_type, buildParms.execution_status);
         core.debug('ISPW: request body: ' + utils.convertObjectToJson(reqBodyObj));
 
-
-
         utils.getHttpPostPromise(reqUrl, buildParms.ces_token, reqBodyObj)
             .then(
                 (response: any) => {
+                    console.log('received from server');
                     core.debug('ISPW: received response body: ' + utils.convertObjectToJson(response.data));
-                    // generate could have passed or failed
+                    // build could have passed or failed
                     setOutputs(response.data);
                     return handleResponseBody(response.data);
                 },
@@ -100,21 +99,6 @@ export async function run() {
             core.setFailed(error.message);
         }
     }
-}
-
-function getHttpPostPromise(requestUrl: URL, token: string, requestBody: any) {
-    const options = {
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token,
-        },
-    };
-
-    core.debug('requestUrl=' + utils.convertObjectToJson(requestUrl));
-    core.debug('token=' + token);
-    core.debug('requestBody=' + utils.convertObjectToJson(requestBody));
-
-    return axios.post(requestUrl.href, requestBody, options);
 }
 
 /**
@@ -216,6 +200,7 @@ function getGenerateAwaitUrlPath(buildParms: BuildParms) {
     } else {
         core.setFailed('Failed to parse task ids from input');
     }
+
     tempUrlStr = tempUrlStr.concat(`level=${buildParms.level}`);
 
     return tempUrlStr;

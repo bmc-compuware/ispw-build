@@ -86,7 +86,6 @@ exports.run = void 0;
 */
 var core = __importStar(__nccwpck_require__(2186));
 var utils = __nccwpck_require__(2045);
-var axios = __nccwpck_require__(6545).default;
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var keys, keyValues, keyValueJson, buildParms, buildAuto, requiredFields, reqPath, reqUrl, reqBodyObj;
@@ -105,6 +104,7 @@ function run() {
                     console.debug('ISPW: buildAuto=', utils.convertObjectToJson(buildAuto));
                     if (buildAuto.taskIds) {
                         buildParms.task_id = buildAuto.taskIds.join(',');
+                        buildParms.level = buildAuto.taskLevel;
                     }
                 }
                 else {
@@ -123,8 +123,9 @@ function run() {
                 core.debug('ISPW: request body: ' + utils.convertObjectToJson(reqBodyObj));
                 utils.getHttpPostPromise(reqUrl, buildParms.ces_token, reqBodyObj)
                     .then(function (response) {
+                    console.log('received from server');
                     core.debug('ISPW: received response body: ' + utils.convertObjectToJson(response.data));
-                    // generate could have passed or failed
+                    // build could have passed or failed
                     setOutputs(response.data);
                     return handleResponseBody(response.data);
                 }, function (error) {
@@ -165,18 +166,6 @@ function run() {
     });
 }
 exports.run = run;
-function getHttpPostPromise(requestUrl, token, requestBody) {
-    var options = {
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token,
-        },
-    };
-    core.debug('requestUrl=' + utils.convertObjectToJson(requestUrl));
-    core.debug('token=' + token);
-    core.debug('requestBody=' + utils.convertObjectToJson(requestBody));
-    return axios.post(requestUrl.href, requestBody, options);
-}
 /**
  * Examines the given response body to determine whether an error occurred
  * during the generate.
