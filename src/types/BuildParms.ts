@@ -10,7 +10,7 @@ export interface BuildParms {
     ces_url: string,
     ces_token: string,
     srid: string,
-    runtime_configuration: string,
+    runtime_configuration?: string,
     build_automatically?: string,
     application?: string,
     assignment_id?: string,
