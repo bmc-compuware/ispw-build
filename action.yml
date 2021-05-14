@@ -16,21 +16,6 @@ inputs:
   runtime_configuration:
     description: 'The runtime configuration used when connecting to ISPW'
     required: false
-  application:
-    description: 'The application that includes the task to be built'
-    required: false
-  assignment_id:
-    description: 'The container for which you intend to build tasks.'
-    required: false
-  level:
-    description: 'The level that the tasks exist at in the assignment'
-    required: false
-  mname:
-    description: 'The name of the task to be built'
-    required: false
-  mtype:
-    description: 'The type of the task to be built'
-    required: false
   task_id:
     description: 'The comma-separated list of task IDs for the tasks that need to be built'
     required: false

@@ -12,12 +12,13 @@ import * as core from '@actions/core';
 import { URL } from 'url';
 import { BuildAuto } from './types/BuildAuto';
 import { BuildParms } from './types/BuildParms';
+import { CommonUtils } from './utils/CommonUtils';
 
 const utils = require('@bmc-compuware/ispw-action-utilities');
 
 export async function run() {
     try {
-        let keys = ['build_automatically', 'application', 'assignment_id', 'level', 'mname', 'mtype', 'task_id', 'ces_url',
+        let keys = ['build_automatically', 'level', 'task_id', 'ces_url',
             'ces_token', 'srid', 'runtime_configuration', 'change_type', 'execution_status'];
 
         let keyValues: Object = utils.retrieveInputs(core, keys);
@@ -57,7 +58,7 @@ export async function run() {
         const reqBodyObj = assembleRequestBodyObject(buildParms.runtime_configuration, buildParms.change_type, buildParms.execution_status);
         core.debug('ISPW: request body: ' + utils.convertObjectToJson(reqBodyObj));
 
-        utils.getHttpPostPromise(reqUrl, buildParms.ces_token, reqBodyObj)
+        await utils.getHttpPostPromise(reqUrl, buildParms.ces_token, reqBodyObj)
             .then(
                 (response: any) => {
                     console.log('received from server');
@@ -201,7 +202,9 @@ function getGenerateAwaitUrlPath(buildParms: BuildParms) {
         core.setFailed('Failed to parse task ids from input.');
     }
 
-    tempUrlStr = tempUrlStr.concat(`level=${buildParms.level}`);
+    if (CommonUtils.isNotBlank(buildParms.level)) {
+        tempUrlStr = tempUrlStr.concat(`level=${buildParms.level}`);
+    }
 
     return tempUrlStr;
 }
