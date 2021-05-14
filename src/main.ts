@@ -102,16 +102,20 @@ export async function run() {
     }
 }
 
-function getHttpPostPromise(requestUrl : URL, token : string, requestBody : any) {
+function getHttpPostPromise(requestUrl: URL, token: string, requestBody: any) {
     const options = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token,
-      },
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token,
+        },
     };
 
+    core.debug('requestUrl=' + utils.convertObjectToJson(requestUrl));
+    core.debug('token=' + token);
+    core.debug('requestBody=' + utils.convertObjectToJson(requestBody));
+
     return axios.post(requestUrl.href, requestBody, options);
-  }
+}
 
 /**
  * Examines the given response body to determine whether an error occurred
