@@ -14,6 +14,7 @@ import { BuildAuto } from './types/BuildAuto';
 import { BuildParms } from './types/BuildParms';
 
 const utils = require('@bmc-compuware/ispw-action-utilities');
+const axios = require('axios').default;
 
 export async function run() {
     try {
@@ -55,6 +56,8 @@ export async function run() {
 
         const reqBodyObj = assembleRequestBodyObject(buildParms.runtime_configuration, buildParms.change_type, buildParms.execution_status);
         core.debug('ISPW: request body: ' + utils.convertObjectToJson(reqBodyObj));
+
+
 
         utils.getHttpPostPromise(reqUrl, buildParms.ces_token, reqBodyObj)
             .then(
@@ -98,6 +101,17 @@ export async function run() {
         }
     }
 }
+
+function getHttpPostPromise(requestUrl : URL, token : string, requestBody : any) {
+    const options = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token,
+      },
+    };
+
+    return axios.post(requestUrl.href, requestBody, options);
+  }
 
 /**
  * Examines the given response body to determine whether an error occurred

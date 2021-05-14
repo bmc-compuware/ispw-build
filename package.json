@@ -30,6 +30,7 @@
     "@actions/core": "^1.2.7",
     "@actions/github": "^4.0.0",
     "@bmc-compuware/ispw-action-utilities": "^1.0.0",
+    "axios": "^0.21.1",
     "lodash": "^4.17.21",
     "path": "^0.12.7"
   },
