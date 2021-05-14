@@ -7,43 +7,36 @@
 * This code is licensed under MIT license (see LICENSE.txt for details)
 */
 
-import * as core from '@actions/core'
+import * as core from '@actions/core';
 import { BuildAuto } from './types/BuildAuto';
-import { BuildParms } from './types/BuildParms'
+import { BuildParms } from './types/BuildParms';
+
 const utils = require('@bmc-compuware/ispw-action-utilities');
 
 export async function run() {
-
-    let buildAuto : BuildAuto | any = undefined;
-
-    let inputs = ['build_automatically', 'application', 'assignment_id', 'level', 'mname', 'mtype', 'task_id', 'ces_url',
+    let keys = ['build_automatically', 'application', 'assignment_id', 'level', 'mname', 'mtype', 'task_id', 'ces_url',
         'ces_token', 'srid', 'runtime_configuration', 'change_type', 'execution_status'];
-    inputs = utils.retrieveInputs(core, inputs);
 
-    core.debug('ISPW: parsed inputs: ' + utils.convertObjectToJson(inputs));
+    let keyValues: Object = utils.retrieveInputs(core, keys);
+    let keyValueJson = utils.convertObjectToJson(keyValues);
+    core.debug('ISPW: raw data = ' + keyValueJson);
 
-    let buildParms : BuildParms = utils.parseStringAsJson((utils.convertObjectToJson(inputs))) ;
-    core.debug("1: url="+ buildParms.ces_url+', runtime='+buildParms.runtime_configuration
-        +', srid='+buildParms.srid+', typeof='+typeof(buildParms.build_automatically+', auto='+buildParms.build_automatically))
+    let buildParms: BuildParms = utils.parseStringAsJson(keyValueJson);
+    core.debug('ISPW: buildParms = ' + utils.convertObjectToJson(buildParms));
+
     if (utils.stringHasContent(buildParms.build_automatically)) {
-        console.log('Generate parameters are being retrieved from the ' +
-            'generate_automatically input.');
-        //buildParms = utils.parseStringAsJson(inputs.build_automatically);
-        buildAuto = utils.parseStringAsJson(buildParms.build_automatically);
-        console.debug('2: buildAuto=', utils.convertObjectToJson(buildAuto))
-        console.debug(buildAuto.containerId+',typeof='+typeof(buildAuto.taskIds)+', length='+buildAuto.taskIds[0]);
+        console.log('Generate parameters are being retrieved from the generate_automatically input.');
+
+        let buildAuto: BuildAuto = utils.parseStringAsJson(buildParms.build_automatically);
+        console.debug('ISPW: buildAuto=', utils.convertObjectToJson(buildAuto));
+
+        if (buildAuto.taskIds) {
+            buildParms.task_id = buildAuto.taskIds.join(',')
+        }
     } else {
         console.log('Generate parameters are being retrieved from the inputs.');
-        //buildParms = getParmsFromInputs(inputs.assignment_id, inputs.level, inputs.task_id);
-        console.debug('buildParms=', utils.convertObjectToJson(buildParms))
     }
 
-    core.debug('ISPW: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
-
-    if( typeof(buildAuto) != undefined ) {
-        core.debug("let's build auto");
-    } else {
-        core.debug("let's NOT build auto")
-    }
+    core.debug('ISPW: redefined buildParms: ' + utils.convertObjectToJson(buildParms));
 }
 

@@ -1,0 +1,33 @@
+name: Test action input values
+
+on:  # Triggers the workflow on push or pull request events but only for the main branch
+  #push:
+  #  branches: [ branch ]
+  #pull_request:
+  #  branches: [ branch ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  generate:
+    name: Running build
+    runs-on: [self-hosted, Windows, X64]
+    steps:
+      - name: build
+        uses: bmc-compuware/ispw-build@main
+        id: build
+        with:
+          ces_url: 'http://localhost:48226/'
+          ces_token: 'token1'
+          srid: 'srid1'
+          runtime_configuration: 'ISPW'
+          application: 'PLAY'
+          assignment_id: 'PLAY004799'
+          level: 'DEV1'
+          mname: 'TPROG01'
+          mtype: 'COB'
+          task_id: '7E53CC8FB3D6, 7E53CC8FB3D6, 7E53CC8FB3D6'
+          build_automatically: '{"containerId":"PLAY004799","releaseId":" ","taskLevel":"DEV2","taskIds":["8E53CC8FB3D6", "8E53CC8FB3D6", "8E53CC8FB3D7"]}'
+          change_type: 'T'
+          execution_status: 'E'

@@ -75,36 +75,27 @@ var core = __importStar(__nccwpck_require__(2186));
 var utils = __nccwpck_require__(2045);
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var buildAuto, inputs, buildParms;
+        var keys, keyValues, keyValueJson, buildParms, buildAuto;
         return __generator(this, function (_a) {
-            buildAuto = undefined;
-            inputs = ['build_automatically', 'application', 'assignment_id', 'level', 'mname', 'mtype', 'task_id', 'ces_url',
+            keys = ['build_automatically', 'application', 'assignment_id', 'level', 'mname', 'mtype', 'task_id', 'ces_url',
                 'ces_token', 'srid', 'runtime_configuration', 'change_type', 'execution_status'];
-            inputs = utils.retrieveInputs(core, inputs);
-            core.debug('ISPW: parsed inputs: ' + utils.convertObjectToJson(inputs));
-            buildParms = utils.parseStringAsJson((utils.convertObjectToJson(inputs)));
-            core.debug("1: url=" + buildParms.ces_url + ', runtime=' + buildParms.runtime_configuration
-                + ', srid=' + buildParms.srid + ', typeof=' + typeof (buildParms.build_automatically + ', auto=' + buildParms.build_automatically));
+            keyValues = utils.retrieveInputs(core, keys);
+            keyValueJson = utils.convertObjectToJson(keyValues);
+            core.debug('ISPW: raw data = ' + keyValueJson);
+            buildParms = utils.parseStringAsJson(keyValueJson);
+            core.debug('ISPW: buildParms = ' + utils.convertObjectToJson(buildParms));
             if (utils.stringHasContent(buildParms.build_automatically)) {
-                console.log('Generate parameters are being retrieved from the ' +
-                    'generate_automatically input.');
-                //buildParms = utils.parseStringAsJson(inputs.build_automatically);
+                console.log('Generate parameters are being retrieved from the generate_automatically input.');
                 buildAuto = utils.parseStringAsJson(buildParms.build_automatically);
-                console.debug('2: buildAuto=', utils.convertObjectToJson(buildAuto));
-                console.debug(buildAuto.containerId + ',typeof=' + typeof (buildAuto.taskIds) + ', length=' + buildAuto.taskIds[0]);
+                console.debug('ISPW: buildAuto=', utils.convertObjectToJson(buildAuto));
+                if (buildAuto.taskIds) {
+                    buildParms.task_id = buildAuto.taskIds.join(',');
+                }
             }
             else {
                 console.log('Generate parameters are being retrieved from the inputs.');
-                //buildParms = getParmsFromInputs(inputs.assignment_id, inputs.level, inputs.task_id);
-                console.debug('buildParms=', utils.convertObjectToJson(buildParms));
             }
-            core.debug('ISPW: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
-            if (typeof (buildAuto) != undefined) {
-                core.debug("let's build auto");
-            }
-            else {
-                core.debug("let's NOT build auto");
-            }
+            core.debug('ISPW: redefined buildParms: ' + utils.convertObjectToJson(buildParms));
             return [2 /*return*/];
         });
     });
@@ -4615,6 +4606,14 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 
+/**
+* ALL BMC SOFTWARE PRODUCTS LISTED WITHIN THE MATERIALS ARE TRADEMARKS OF BMC
+* SOFTWARE, INC. ALL OTHER COMPANY PRODUCT NAMES ARE TRADEMARKS OF THEIR
+* RESPECTIVE OWNERS.
+*
+* (c) Copyright 2021 BMC Software, Inc.
+* This code is licensed under MIT license (see LICENSE.txt for details)
+*/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var main_1 = __nccwpck_require__(3109);
 main_1.run();
