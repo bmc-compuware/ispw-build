@@ -265,7 +265,7 @@ function getGenerateAwaitUrlPath(buildParms) {
         });
     }
     else {
-        core.setFailed('Failed to parse task ids from input.');
+        core.setFailed('Failed to parse task ids from input');
     }
     if (CommonUtils_1.CommonUtils.isNotBlank(buildParms.level)) {
         tempUrlStr = tempUrlStr.concat("level=" + buildParms.level);
