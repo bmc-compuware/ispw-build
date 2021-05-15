@@ -139,6 +139,7 @@ function handleResponseBody(responseBody: any): any {
  */
 function setOutputs(responseBody: any) {
     if (responseBody) {
+        core.setOutput('output_json', utils.convertObjectToJson(responseBody))
         core.setOutput('set_id', responseBody.setId);
         core.setOutput('url', responseBody.url);
         core.setOutput('assignment_id', responseBody.assignmentId);
