@@ -7,13 +7,13 @@
 * This code is licensed under MIT license (see LICENSE.txt for details)
 */
 export interface BuildParms {
-    ces_url: string,
-    ces_token: string,
-    srid: string,
-    runtime_configuration?: string,
-    build_automatically?: string,
-    level?: string,
-    task_id?: string,
-    change_type?: string,
-    execution_status?: string
+    ces_url: string;
+    ces_token: string;
+    srid: string;
+    runtime_configuration?: string;
+    build_automatically?: string;
+    level?: string;
+    task_id?: string;
+    change_type?: string;
+    execution_status?: string;
 }

@@ -8,7 +8,7 @@
 */
 
 export interface CesRequestBody {
-    runtimeConfiguration?: string,
-    changeType?: string,
-    execStatus?: string
+    runtimeConfiguration?: string;
+    changeType?: string;
+    execStatus?: string;
 }

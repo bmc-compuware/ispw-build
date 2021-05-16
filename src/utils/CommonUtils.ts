@@ -6,52 +6,38 @@
 * This code is licensed under MIT license (see LICENSE.txt for details)
 */
 
-export namespace CommonUtils {
+import _ from 'lodash';
+/**
+ * Test if the input value is blank
+ * 
+ * @param value the value to be tested
+ */
+export function isBlank(value: any): boolean {
+    let newValue = value;
 
-    const _ = require('lodash');
-
-    /**
-     * Test if the input value is blank
-     * 
-     * @param value the value to be tested
-     */
-    export function isBlank(value: any): boolean {
-        let newValue = value;
-
-        if (_.isString(value)) {
-            newValue = _.trim(value);
-        }
-
-        return _.isEmpty(newValue) && !_.isNumber(newValue) || _.isNaN(newValue);
+    if (_.isString(value)) {
+        newValue = _.trim(value);
     }
 
-    /**
-     * Test if the input value is not blank
-     * 
-     * @param value the value to be tested
-     */
-    export function isNotBlank(value: any): boolean {
-        return !isBlank(value);
-    }
-
-    /**
-     * Detect if running inside Mocha
-     */
-    export function isInMocha() {
-        var context = require('global-var');
-        return ['suite', 'test'].every(function (functionName) {
-            return context[functionName] instanceof Function;
-        });
-    }
-
-    /**
-     * Adds escaped quotation marks around the given string
-     * @param value a string to add quotes around
-     */
-    export function escapeString(value: any): string {
-        let escapedString: string = '\"' + (value || '') + '\"';
-        return escapedString;
-    }
-
-    
+    return _.isEmpty(newValue) && !_.isNumber(newValue) || _.isNaN(newValue);
 }
+
+/**
+ * Test if the input value is not blank
+ * 
+ * @param value the value to be tested
+ */
+export function isNotBlank(value: any): boolean {
+    return !isBlank(value);
+}
+
+/**
+ * Adds escaped quotation marks around the given string
+ * @param value a string to add quotes around
+ */
+export function escapeString(value: any): string {
+    const escapedString: string = '"' + (value || '') + '"';
+    return escapedString;
+}
+
+

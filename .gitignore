@@ -1,7 +1,9 @@
 node_modules
 .nyc_output
-lib
+lib/**/*
+__tests__/runner/*
 coverage
-
+logs
+*.log
 
 

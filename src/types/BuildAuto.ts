@@ -7,8 +7,8 @@
 * This code is licensed under MIT license (see LICENSE.txt for details)
 */
 export interface BuildAuto {
-    containerId: string,
-    releaseId: string,
-    taskLevel: string,
-    taskIds: string[]
+    containerId: string;
+    releaseId: string;
+    taskLevel: string;
+    taskIds: string[];
 }
