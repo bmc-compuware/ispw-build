@@ -8,23 +8,30 @@
         },
         {
             "path": "../../gitrepo/ISPW-GitHub-Runner"
+        },
+        {
+            "path": "../../gitrepo/ispw-generate"
+        },
+        {
+            "path": "../../gitrepo/ispw-sync"
         }
     ],
     "settings": {
         "coboleditor.metadata_symbols": [
-            "tprog11,TPROG11.cob",
-            "tprog10,TPROG10.cob"
+            "tprog10,TPROG10.cob",
+            "tprog11,TPROG11.cob"
         ],
         "coboleditor.metadata_entrypoints": [],
         "coboleditor.metadata_types": [],
         "coboleditor.metadata_files": [
-            "1621089668363,COB/TPROG10.cob"
+            "1621256258648,COB/TPROG10.cob",
+            "1621256264658,COB/TPROG11.cob"
         ],
         "coboleditor.metadata_knowncopybooks": [
-            "TCPYA11,TPROG11.cob",
-            "TCPYB11,TPROG11.cob",
             "TCPYA10,TPROG10.cob",
-            "TCPYB10,TPROG10.cob"
+            "TCPYB10,TPROG10.cob",
+            "TCPYA11,TPROG11.cob",
+            "TCPYB11,TPROG11.cob"
         ]
     }
 }
