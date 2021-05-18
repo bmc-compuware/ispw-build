@@ -15,7 +15,7 @@ jobs:
     name: A job to sync git source into ISPW, then build it on the mainframe
     steps:
       - name: Sync step
-        uses: bmc-compuware/ispw-sync@v20.6.1.gtk
+        uses: bmc-compuware/ispw-sync@v1
         id: sync
         with:
           host: 'host.example.com'
