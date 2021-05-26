@@ -8,18 +8,16 @@
  */
 import * as core from '@actions/core'
 import {URL} from 'url'
-import {BuildAuto} from './types/BuildAuto'
 import {BuildParms} from './types/BuildParms'
+import {Inputs} from './types/Inputs'
 import {CesRequestBody} from './types/CesRequestBody'
-import * as CommonUtils from './utils/CommonUtils'
 
 const utils = require('@bmc-compuware/ispw-action-utilities')
 
-export async function run() {
+export async function run(): Promise<void> {
   try {
-    let keys = [
+    const keys = [
       'build_automatically',
-      'level',
       'task_id',
       'ces_url',
       'ces_token',
@@ -29,63 +27,42 @@ export async function run() {
       'execution_status'
     ]
 
-    let keyValues: Object = utils.retrieveInputs(core, keys)
-    let keyValueJson = utils.convertObjectToJson(keyValues)
-    core.debug('ISPW: raw data = ' + keyValueJson)
+    const inputs = utils.retrieveInputs(core, keys) as Inputs
+    core.debug('ISPW: parsed inputs: ' + utils.convertObjectToJson(inputs))
+    let buildParms: BuildParms
+    if (utils.stringHasContent(inputs.build_automatically)) {
+      console.log('Build parameters are being retrieved from the build_automatically input.')
 
-    let buildParms: BuildParms = utils.parseStringAsJson(keyValueJson)
-    core.debug('ISPW: buildParms = ' + utils.convertObjectToJson(buildParms))
-
-    if (utils.stringHasContent(buildParms.build_automatically)) {
-      console.log(
-        'Build parameters are being retrieved from the build_automatically input.'
-      )
-
-      let buildAuto: BuildAuto = utils.parseStringAsJson(
-        buildParms.build_automatically
-      )
-      console.debug('ISPW: buildAuto=', utils.convertObjectToJson(buildAuto))
-
-      if (buildAuto.taskIds) {
-        buildParms.task_id = buildAuto.taskIds.join(',')
-        buildParms.level = buildAuto.taskLevel
-      }
+      buildParms = utils.parseStringAsJson(inputs.build_automatically) as BuildParms
     } else {
       console.log('Build parameters are being retrieved from the inputs.')
+      buildParms = getParmsFromInputs(inputs.task_id)
     }
-
-    core.debug(
-      'ISPW: redefined buildParms: ' + utils.convertObjectToJson(buildParms)
-    )
+    core.debug('ISPW: parsed buildParms: ' + utils.convertObjectToJson(buildParms))
 
     const requiredFields = ['task_id']
     if (!utils.validateBuildParms(buildParms, requiredFields)) {
       throw new MissingArgumentException(
-        'Inputs required for ispw-build are missing. ' +
-          '\nSkipping the build request....'
+        'Inputs required for ispw-build are missing. ' + '\nSkipping the build request....'
       )
     }
 
-    const reqPath: string = getGenerateAwaitUrlPath(buildParms)
-    const reqUrl: URL = utils.assembleRequestUrl(buildParms.ces_url, reqPath)
+    const reqPath: string = getBuildAwaitUrlPath(inputs.srid, buildParms)
+    const reqUrl: URL = utils.assembleRequestUrl(inputs.ces_url, reqPath)
     core.debug('ISPW: request url: ' + reqUrl.href)
 
-    const reqBodyObj = assembleRequestBodyObject(
-      buildParms.runtime_configuration,
-      buildParms.change_type,
-      buildParms.execution_status
+    const reqBodyObj: CesRequestBody = assembleRequestBodyObject(
+      inputs.runtime_configuration,
+      inputs.change_type,
+      inputs.execution_status
     )
     core.debug('ISPW: request body: ' + utils.convertObjectToJson(reqBodyObj))
 
     await utils
-      .getHttpPostPromise(reqUrl, buildParms.ces_token, reqBodyObj)
+      .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
       .then(
         (response: any) => {
-          console.log('received from server')
-          core.debug(
-            'ISPW: received response body: ' +
-              utils.convertObjectToJson(response.data)
-          )
+          core.debug('ISPW: received response body: ' + utils.convertObjectToJson(response.data))
           // build could have passed or failed
           setOutputs(response.data)
           return handleResponseBody(response.data)
@@ -114,10 +91,8 @@ export async function run() {
 
     // the following code will execute after the HTTP request was started,
     // but before it receives a response.
-    if (buildParms.task_id) {
-      console.log(
-        'Starting the build process for task ' + buildParms.task_id.toString()
-      )
+    if (buildParms.taskIds) {
+      console.log('Starting the build process for task ' + buildParms.taskIds.toString())
     }
   } catch (error) {
     if (error instanceof MissingArgumentException) {
@@ -133,6 +108,22 @@ export async function run() {
 }
 
 /**
+ * Uses the input parameters from the action metadata to fill in a BuildParms
+ * object.
+ * @param  {string} inputTaskId the comma separated list of task IDs passed
+ * into the action
+ * @return {BuildParms} a BuildParms object with the fields filled in.
+ * This will never return undefined.
+ */
+export function getParmsFromInputs(inputTaskId: string | undefined): BuildParms {
+  const buildParms: BuildParms = {}
+  if (inputTaskId && utils.stringHasContent(inputTaskId)) {
+    buildParms.taskIds = inputTaskId.split(',')
+  }
+  return buildParms
+}
+
+/**
  * Examines the given response body to determine whether an error occurred
  * during the generate.
  * @param responseBody The body returned from the CES request
@@ -141,31 +132,23 @@ export async function run() {
  *
  * @throws GenerateFailureException if there were failures during the generate
  */
-function handleResponseBody(responseBody: any): any {
+export function handleResponseBody(responseBody: any): any {
   if (responseBody === undefined) {
     // empty response
-    throw new GenerateFailureException(
-      'No response was received from the build request.'
-    )
+    throw new GenerateFailureException('No response was received from the build request.')
   } else if (responseBody.awaitStatus === undefined) {
     // Build did not complete - there should be a message returned
     if (responseBody.message !== undefined) {
       throw new GenerateFailureException(responseBody.message)
     }
-    throw new GenerateFailureException(
-      'The build request did not complete successfully.'
-    )
+    throw new GenerateFailureException('The build request did not complete successfully.')
   } else if (responseBody.awaitStatus.generateFailedCount !== 0) {
     // there were generate failures
-    console.error(
-      utils.getStatusMessageToPrint(responseBody.awaitStatus.statusMsg)
-    )
+    console.error(utils.getStatusMessageToPrint(responseBody.awaitStatus.statusMsg))
     throw new GenerateFailureException('There were build failures.')
   } else {
     // success
-    console.log(
-      utils.getStatusMessageToPrint(responseBody.awaitStatus.statusMsg)
-    )
+    console.log(utils.getStatusMessageToPrint(responseBody.awaitStatus.statusMsg))
     return responseBody
   }
 }
@@ -183,19 +166,12 @@ function setOutputs(responseBody: any) {
     core.setOutput('assignment_id', responseBody.assignmentId)
 
     const isTimedOut =
-      utils.stringHasContent(responseBody.message) &&
-      responseBody.message.includes('timed out')
+      utils.stringHasContent(responseBody.message) && responseBody.message.includes('timed out')
     core.setOutput('is_timed_out', isTimedOut)
 
     if (responseBody.awaitStatus) {
-      core.setOutput(
-        'generate_failed_count',
-        responseBody.awaitStatus.generateFailedCount
-      )
-      core.setOutput(
-        'generate_success_count',
-        responseBody.awaitStatus.generateSuccessCount
-      )
+      core.setOutput('generate_failed_count', responseBody.awaitStatus.generateFailedCount)
+      core.setOutput('generate_success_count', responseBody.awaitStatus.generateSuccessCount)
       core.setOutput('has_failures', responseBody.awaitStatus.hasFailures)
       core.setOutput('task_count', responseBody.awaitStatus.taskCount)
     }
@@ -211,7 +187,7 @@ function setOutputs(responseBody: any) {
  * in the inputs
  * @return an CesRequestBody with all the fields for the request body filled in
  */
-function assembleRequestBodyObject(
+export function assembleRequestBodyObject(
   runtimeConfig: string | undefined,
   changeType: string | undefined,
   executionStatus: string | undefined
@@ -238,22 +214,14 @@ function assembleRequestBodyObject(
  * @param buildParms The build parms to use when filling out the request url
  * @return the request path which can be appended to the CES url
  */
-function getGenerateAwaitUrlPath(buildParms: BuildParms) {
-  let tempUrlStr = `/ispw/${buildParms.srid}/build-await?`
-  let taskIds: string[] | undefined = buildParms.task_id?.split(',')
-
-  if (taskIds) {
-    taskIds.forEach(id => {
+export function getBuildAwaitUrlPath(srid: string, buildParms: BuildParms) {
+  let tempUrlStr = `/ispw/${srid}/build-await?`
+  if (buildParms.taskIds) {
+    buildParms.taskIds.forEach(id => {
       tempUrlStr = tempUrlStr.concat(`taskId=${id}&`)
     })
-  } else {
-    core.setFailed('Failed to parse task ids from input')
   }
-
-  if (CommonUtils.isNotBlank(buildParms.level)) {
-    tempUrlStr = tempUrlStr.concat(`level=${buildParms.level}`)
-  }
-
+  tempUrlStr = tempUrlStr.slice(0, -1)
   return tempUrlStr
 }
 
@@ -262,9 +230,10 @@ function getGenerateAwaitUrlPath(buildParms: BuildParms) {
  *
  * @param message the message associated with the error
  */
-class MissingArgumentException extends Error {
+export class MissingArgumentException extends Error {
   constructor(message: string) {
     super(message)
+    Object.setPrototypeOf(this, MissingArgumentException.prototype)
     this.name = 'MissingArgumentException'
   }
 }
@@ -275,9 +244,10 @@ class MissingArgumentException extends Error {
  *
  * @param message the message associated with the error
  */
-class GenerateFailureException extends Error {
+export class GenerateFailureException extends Error {
   constructor(message: string) {
     super(message)
+    Object.setPrototypeOf(this, GenerateFailureException.prototype)
     this.name = 'GenerateFailureException'
   }
 }

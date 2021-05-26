@@ -6,9 +6,13 @@
  * (c) Copyright 2021 BMC Software, Inc.
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-
-export interface CesRequestBody {
-  runtimeConfiguration?: string
-  changeType?: string
-  execStatus?: string
+export interface Inputs {
+  ces_url: string
+  ces_token: string
+  srid: string
+  runtime_configuration?: string
+  build_automatically?: string
+  task_id?: string
+  change_type?: string
+  execution_status?: string
 }

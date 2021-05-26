@@ -39,7 +39,7 @@ jobs:
           runtime_configuration: 'ISPW'
           build_automatically: ${{ steps.sync.outputs.automaticBuildJson }}
       - name: Get the number of generate failures
-        run: echo "The number of generate failures is ${{ steps.generate.outputs.generate_failed_count }}"
+        run: echo "The number of generate failures is ${{ steps.build.outputs.generate_failed_count }}"
 ```
 
 The following example will generate two specific ISPW tasks 
