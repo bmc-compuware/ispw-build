@@ -164,7 +164,12 @@ function run() {
                                 core.debug('ISPW: received error response body: ' +
                                     utils.convertObjectToJson(error.response.data));
                                 setOutputs(error.response.data);
-                                throw new GenerateFailureException(error.response.data.message);
+                                if (error.response.data) {
+                                    throw new GenerateFailureException(error.response.data.message);
+                                }
+                                else {
+                                    throw new GenerateFailureException('There was a problem with the request to CES');
+                                }
                             }
                             throw error;
                         })
