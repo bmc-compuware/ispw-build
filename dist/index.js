@@ -147,6 +147,9 @@ function run() {
                     core.debug('ISPW: request url: ' + reqUrl.href);
                     reqBodyObj = assembleRequestBodyObject(inputs.runtime_configuration, inputs.change_type, inputs.execution_status);
                     core.debug('ISPW: request body: ' + utils.convertObjectToJson(reqBodyObj));
+                    if (buildParms.taskIds) {
+                        console.log('Starting the build process for task ' + buildParms.taskIds.toString());
+                    }
                     return [4 /*yield*/, utils
                             .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
                             .then(function (response) {
@@ -168,17 +171,9 @@ function run() {
                             .then(function () { return console.log('The build request completed successfully.'); }, function (error) {
                             core.debug(error.stack);
                             core.setFailed(error.message);
-                        })
-                        // the following code will execute after the HTTP request was started,
-                        // but before it receives a response.
-                    ];
+                        })];
                 case 1:
                     _a.sent();
-                    // the following code will execute after the HTTP request was started,
-                    // but before it receives a response.
-                    if (buildParms.taskIds) {
-                        console.log('Starting the build process for task ' + buildParms.taskIds.toString());
-                    }
                     return [3 /*break*/, 3];
                 case 2:
                     error_1 = _a.sent();
