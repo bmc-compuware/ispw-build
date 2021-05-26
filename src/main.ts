@@ -58,6 +58,10 @@ export async function run(): Promise<void> {
     )
     core.debug('ISPW: request body: ' + utils.convertObjectToJson(reqBodyObj))
 
+    if (buildParms.taskIds) {
+      console.log('Starting the build process for task ' + buildParms.taskIds.toString())
+    }
+
     await utils
       .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
       .then(
@@ -89,11 +93,6 @@ export async function run(): Promise<void> {
         }
       )
 
-    // the following code will execute after the HTTP request was started,
-    // but before it receives a response.
-    if (buildParms.taskIds) {
-      console.log('Starting the build process for task ' + buildParms.taskIds.toString())
-    }
   } catch (error) {
     if (error instanceof MissingArgumentException) {
       // this would occur if there was nothing to load during the sync process
