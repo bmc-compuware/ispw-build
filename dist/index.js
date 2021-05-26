@@ -138,7 +138,7 @@ function run() {
                         buildParms = getParmsFromInputs(inputs.task_id);
                     }
                     core.debug('ISPW: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
-                    requiredFields = ['task_id'];
+                    requiredFields = ['taskIds'];
                     if (!utils.validateBuildParms(buildParms, requiredFields)) {
                         throw new MissingArgumentException('Inputs required for ispw-build are missing. ' + '\nSkipping the build request....');
                     }
