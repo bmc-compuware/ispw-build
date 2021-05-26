@@ -40,7 +40,7 @@ export async function run(): Promise<void> {
     }
     core.debug('ISPW: parsed buildParms: ' + utils.convertObjectToJson(buildParms))
 
-    const requiredFields = ['task_id']
+    const requiredFields = ['taskIds']
     if (!utils.validateBuildParms(buildParms, requiredFields)) {
       throw new MissingArgumentException(
         'Inputs required for ispw-build are missing. ' + '\nSkipping the build request....'
