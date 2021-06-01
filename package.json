@@ -2,7 +2,7 @@
   "name": "ispw-build",
   "version": "1.0.0",
   "description": "ISPW github action build",
-  "main": "lib/ispw-build.js",
+  "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write **/*.ts",
