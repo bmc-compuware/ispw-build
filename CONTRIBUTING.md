@@ -30,6 +30,8 @@ Adding changes to the currently-published release is acceptable as long as the c
 
 Steps to move the current version tag to the latest commit in the main branch:
 
+> :warning: Proceed only if you know what you're doing. These steps need to be done quickly because once a release tag is deleted, that action will not be available to any users until the tag is recreated
+
 (the current version in this example is 'v1')
 
 1. `git checkout -b release/v1` - creates a new branch named "release/v1"
@@ -41,6 +43,7 @@ Steps to move the current version tag to the latest commit in the main branch:
 7. `git push origin :refs/tags/v1` - deletes the current 'v1' tag from the remote
 8. `git tag -fa v1 -m "v1"` - adds a new 'v1' tag to the latest commit (done in step 5)
 9. `git push origin v1` - pushes the new tag to the remote
+10. Go to Github and publish a new release of the action, pointing to the tag you just recreated
 
 ### Creating a new tag
 
@@ -60,3 +63,10 @@ Steps for publishing a new version:
 8. `git push origin v2` - pushes the new tag to the remote
 
 ### Publishing a new release
+
+1. Go to https://github.com/bmc-compuware/ispw-build/releases/new
+2. Fill in or correct any necessary information
+3. Put the tag you want to be released as a new version in the "Tag" field (example: v1) If the tag does not exist, it will be created automatically.
+4. Title the release with the version number
+5. Add a description for what has changed
+6. Click the green Publish release button
