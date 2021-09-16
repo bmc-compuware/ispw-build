@@ -1,5 +1,5 @@
 name: 'ispw-build'
-description: 'Run a build in ISPW'
+description: 'Run a mainframe build using ISPW'
 branding:
   icon: play
   color: orange
