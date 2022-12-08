@@ -133,3 +133,6 @@ To enable debug logging in your GitHub actions workflow, see the guide [here](ht
 ### Developers
 
 For information about contributing to the ispw-build action, see [Developing on the ispw-build GitHub action](./CONTRIBUTING.md)
+
+## See also
+- [License](LICENSE.txt)
