@@ -1,7 +1,7 @@
 {
-  "name": "ispw-build",
+  "name": "code-pipeline-build",
   "version": "1.0.0",
-  "description": "ISPW github action build",
+  "description": "Code Pipeline github action build",
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
@@ -21,9 +21,11 @@
     "ispw-build",
     "BMC",
     "Compuware",
-    "actions"
+    "actions",
+    "Code Pipeline",
+    "AMI"
   ],
-  "author": "BMC Compuware",
+  "author": "BMC",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/bmc-compuware/ispw-build/issues"
