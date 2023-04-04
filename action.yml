@@ -1,5 +1,5 @@
-name: 'ispw-build'
-description: 'Run a mainframe build using ISPW'
+name: 'code-pipeline-build'
+description: 'Run a mainframe build using Code Pipeline'
 branding:
   icon: play
   color: orange
@@ -8,19 +8,19 @@ inputs:
     description: 'The URL to send requests to.'
     required: true
   ces_token:
-    description: 'The token to use when connecting to ISPW through CES'
+    description: 'The token to use when connecting to Code Pipeline through CES'
     required: true
   srid:
-    description: 'The ID for the instance of ISPW to connect to'
+    description: 'The ID for the instance of Code Pipeline to connect to'
     required: true
   runtime_configuration:
-    description: 'The runtime configuration used when connecting to ISPW'
+    description: 'The runtime configuration used when connecting to Code Pipeline'
     required: false
   task_id:
     description: 'The comma-separated list of task IDs for the tasks that need to be built'
     required: false
   build_automatically:
-    description: 'The request parameters for the generate will come from JSON passed in this input. This option is only valid when used in combination with a Git to ISPW Integration step'
+    description: 'The request parameters for the generate will come from JSON passed in this input. This option is only valid when used in combination with a Git to Code Pipeline Integration step'
     required: false
   change_type: 
     description: 'S for standard, I for incidental, or E for emergency. Default value of S'

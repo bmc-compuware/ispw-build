@@ -28,7 +28,7 @@ export async function run(): Promise<void> {
     ]
 
     const inputs = utils.retrieveInputs(core, keys) as Inputs
-    core.debug('ISPW: parsed inputs: ' + utils.convertObjectToJson(inputs))
+    core.debug('Code Pipeline: parsed inputs: ' + utils.convertObjectToJson(inputs))
     let buildParms: BuildParms
     if (utils.stringHasContent(inputs.build_automatically)) {
       console.log('Build parameters are being retrieved from the build_automatically input.')
@@ -38,25 +38,25 @@ export async function run(): Promise<void> {
       console.log('Build parameters are being retrieved from the inputs.')
       buildParms = getParmsFromInputs(inputs.task_id)
     }
-    core.debug('ISPW: parsed buildParms: ' + utils.convertObjectToJson(buildParms))
+    core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms))
 
     const requiredFields = ['taskIds']
     if (!utils.validateBuildParms(buildParms, requiredFields)) {
       throw new MissingArgumentException(
-        'Inputs required for ispw-build are missing. ' + '\nSkipping the build request....'
+        'Inputs required for code-pipeline-build are missing. ' + '\nSkipping the build request....'
       )
     }
 
     const reqPath: string = getBuildAwaitUrlPath(inputs.srid, buildParms)
     const reqUrl: URL = utils.assembleRequestUrl(inputs.ces_url, reqPath)
-    core.debug('ISPW: request url: ' + reqUrl.href)
+    core.debug('Code Pipeline: request url: ' + reqUrl.href)
 
     const reqBodyObj: CesRequestBody = assembleRequestBodyObject(
       inputs.runtime_configuration,
       inputs.change_type,
       inputs.execution_status
     )
-    core.debug('ISPW: request body: ' + utils.convertObjectToJson(reqBodyObj))
+    core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj))
 
     if (buildParms.taskIds) {
       console.log('Starting the build process for task ' + buildParms.taskIds.toString())
@@ -66,7 +66,7 @@ export async function run(): Promise<void> {
       .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
       .then(
         (response: any) => {
-          core.debug('ISPW: received response body: ' + utils.convertObjectToJson(response.data))
+          core.debug('Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data))
           // build could have passed or failed
           setOutputs(response.data)
           return handleResponseBody(response.data)
@@ -74,9 +74,9 @@ export async function run(): Promise<void> {
         (error: any) => {
           // there was a problem with the request to CES
           if (error.response !== undefined) {
-            core.debug('ISPW: received error code: ' + error.response.status)
+            core.debug('Code Pipeline: received error code: ' + error.response.status)
             core.debug(
-              'ISPW: received error response body: ' +
+              'Code Pipeline: received error response body: ' +
                 utils.convertObjectToJson(error.response.data)
             )
             setOutputs(error.response.data)
