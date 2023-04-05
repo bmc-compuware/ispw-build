@@ -43,7 +43,7 @@ export async function run(): Promise<void> {
     const requiredFields = ['taskIds']
     if (!utils.validateBuildParms(buildParms, requiredFields)) {
       throw new MissingArgumentException(
-        'Inputs required for code-pipeline-build are missing. ' + '\nSkipping the build request....'
+        'Inputs required for Code Pipeline Build are missing. ' + '\nSkipping the build request....'
       )
     }
 

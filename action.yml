@@ -1,4 +1,4 @@
-name: 'code-pipeline-build'
+name: 'Code Pipeline Build'
 description: 'Run a mainframe build using Code Pipeline'
 branding:
   icon: play
