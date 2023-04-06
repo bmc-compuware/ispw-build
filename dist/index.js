@@ -174,7 +174,7 @@ function run() {
                     }
                     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
                     requiredFields = ['taskIds'];
-                    if (!utils.validateBuildParms(buildParms, requiredFields)) {
+                    if (!utils.validateBuildParms(buildParms, requiredFields)) {s
                         throw new MissingArgumentException('Inputs required for Code Pipeline Build are missing. ' + '\nSkipping the build request....');
                     }
                     reqPath = getBuildAwaitUrlPath(inputs.srid, buildParms);
