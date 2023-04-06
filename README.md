@@ -1,6 +1,6 @@
-# code-pipeline-build
+# Code Pipeline Build
 
-The code-pipeline-build action allows your GitHub Actions workflow to trigger a build in your instance of BMC AMI DevX Workbench Code Pipeline on the mainframe. This action can be used in scenarios where your mainframe source is stored in git, or when you want your GitHub Actions workflow to operate on source that is already stored in Code Pipeline.
+The Code Pipeline Build action allows your GitHub Actions workflow to trigger a build in your instance of BMC AMI DevX Workbench Code Pipeline on the mainframe. This action can be used in scenarios where your mainframe source is stored in git, or when you want your GitHub Actions workflow to operate on source that is already stored in Code Pipeline.
 
 ## Example usage
 
@@ -75,7 +75,7 @@ jobs:
 | `change_type` | Optional | The change type of this request. The default value is 'S' for standard. |
 | `execution_status` | Optional | The flag to indicate whether the build should happen immediately, or should be held. The default is 'I' for immediate. Other possible value is 'H' for hold. |
 | `runtime_configuration` | Optional | The runtime configuration for the instance of Code Pipeline you are connecting to. |
-| `build_automatically` | Optional | A string of JSON that contains the parameters for the build. If using an code-pipeline-sync or code-pipeline-sync-local step before the build, this JSON string can be retrieved from the outputs of that step. If `build_automatically` is not being used, then the task_id must be specified. |
+| `build_automatically` | Optional | A string of JSON that contains the parameters for the build. If using a Code Pipeline Sync or Code Pipeline Sync Local step before the build, this JSON string can be retrieved from the outputs of that step. If `build_automatically` is not being used, then the task_id must be specified. |
 | `task_id` | Optional | The comma-separated string of task IDs for the tasks that need to be built. Do not use if `build_automatically` has already been specified.|
 
 ## Outputs
@@ -124,7 +124,7 @@ On the New Secret page, paste the token that was copied earlier and click the Ad
 
 ### Fill in the workflow script
 
-Use the examples above to fill in a workflow script using the code-pipeline-build action. Note that if you want taskIds to be automatically picked up from the Code Pipeline synchronization with Git, you will need a synchronization step in you job, which will run before the build.
+Use the examples above to fill in a workflow script using the Code Pipeline Build action. Note that if you want taskIds to be automatically picked up from the Code Pipeline synchronization with Git, you will need a synchronization step in you job, which will run before the build.
 
 ### Troubleshooting
 
@@ -132,7 +132,7 @@ To enable debug logging in your GitHub actions workflow, see the guide [here](ht
 
 ### Developers
 
-For information about contributing to the code-pipeline-build action, see [Developing on the code-pipeline-build GitHub action](./CONTRIBUTING.md)
+For information about contributing to the Code Pipeline Build action, see [Developing on the Code Pipeline Build GitHub action](./CONTRIBUTING.md)
 
 ## See also
 - [License](LICENSE.txt)
