@@ -146,7 +146,7 @@ export async function run(): Promise<void> {
 
     }
 
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof MissingArgumentException) {
       // this would occur if there was nothing to load during the sync process
       // no need to fail the action if the generate is never attempted
