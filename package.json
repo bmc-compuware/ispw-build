@@ -4,7 +4,7 @@
   "description": "Code Pipeline github action build",
   "main": "./dist/main.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && ncc build dist/main.js",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts --fix",
