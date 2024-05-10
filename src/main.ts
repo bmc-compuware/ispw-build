@@ -68,8 +68,15 @@ export async function run(): Promise<void> {
       console.log('Starting the build process for task ' + buildParms.taskIds.toString())
     }
 
+
+    console.log('print certi ' + inputs.certificate.toString())
+    console.log('print srid ' + inputs.srid.toString())
+    console.log('print host ' + host.toString())
+    console.log('print port ' + port.toString())
+
     if(isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) {
       //for token
+      console.log('print for token')
       await utils
       .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
       .then(
@@ -108,6 +115,7 @@ export async function run(): Promise<void> {
 
     }else {
       //for certi
+      console.log('print for certi flow start')
       await utils
       .getHttpPostPromiseWithCert(reqUrl, inputs.certificate, host, port, reqBodyObj)
       .then(
