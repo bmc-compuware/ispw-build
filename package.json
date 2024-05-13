@@ -4,7 +4,7 @@
   "description": "Code Pipeline github action build",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && ncc build -o dist",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts --fix",
@@ -32,10 +32,11 @@
   },
   "homepage": "https://github.com/bmc-compuware/ispw-build#readme",
   "dependencies": {
-    "@actions/core": "^1.2.7",
+    "@actions/core": "^1.10.1",
     "@actions/github": "^4.0.0",
     "@bmc-compuware/ispw-action-utilities": "^1.0.0",
     "@types/lodash": "^4.14.169",
+    "@vercel/ncc": "^0.38.1",
     "axios": "^0.21.1",
     "path": "^0.12.7"
   },
@@ -43,7 +44,6 @@
     "@types/jest": "^26.0.15",
     "@types/node": "^14.14.9",
     "@typescript-eslint/parser": "^4.8.1",
-    "@vercel/ncc": "^0.34.0",
     "eslint": "^7.17.0",
     "eslint-plugin-github": "^4.1.1",
     "eslint-plugin-jest": "^24.1.3",
