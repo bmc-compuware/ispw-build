@@ -35,7 +35,7 @@ export async function run(): Promise<void> {
 
       buildParms = utils.parseStringAsJson(inputs.build_automatically) as BuildParms
     } else {
-      console.log('Build parameters are being retrieved from the inputs111.')
+      console.log('Build parameters are being retrieved from the inputs1111.')
       buildParms = getParmsFromInputs(inputs.task_id)
     }
     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms))
@@ -84,7 +84,7 @@ export async function run(): Promise<void> {
               throw new GenerateFailureException(error.response.data.message)
             }
             else {
-              throw new GenerateFailureException('There was a problem with the request to CES')
+              throw new GenerateFailureException('There was a problem with the request to CES1')
             }
           }
           throw error
