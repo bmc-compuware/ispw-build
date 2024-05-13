@@ -31,7 +31,7 @@ export async function run(): Promise<void> {
     core.debug('Code Pipeline: parsed inputs: ' + utils.convertObjectToJson(inputs))
     let buildParms: BuildParms
     if (utils.stringHasContent(inputs.build_automatically)) {
-      console.log('Build parameters are being retrieved from the build_automatically input.')
+      console.log('Build parameters are being retrieved from the build_automatically input11.')
 
       buildParms = utils.parseStringAsJson(inputs.build_automatically) as BuildParms
     } else {
@@ -91,7 +91,7 @@ export async function run(): Promise<void> {
         }
       )
       .then(
-        () => console.log('The build request completed successfully.'),
+        () => console.log('The build request completed successfully. changes is reflecting'),
         (error: any) => {
           core.debug(error.stack)
           core.setFailed(error.message)
