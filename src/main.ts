@@ -36,7 +36,7 @@ export async function run(): Promise<void> {
 
       buildParms = utils.parseStringAsJson(inputs.build_automatically) as BuildParms
     } else {
-      console.log('Build parameters are being retrieved from the inputs.')
+      console.log('Build parameters are being retrieved from the inputs3.')
       buildParms = getParmsFromInputs(inputs.task_id)
     }
     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms))

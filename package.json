@@ -2,9 +2,9 @@
   "name": "code-pipeline-build",
   "version": "1.0.0",
   "description": "Code Pipeline github action build",
-  "main": "./dist/main.js",
+  "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && ncc build lib/main.js",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts --fix",
