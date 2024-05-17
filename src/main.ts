@@ -28,6 +28,7 @@ export async function run(): Promise<void> {
       'execution_status'
     ]
 
+    console.log('dev workflow - certi added');
     const inputs = utils.retrieveInputs(core, keys) as Inputs
     core.debug('Code Pipeline: parsed inputs: ' + utils.convertObjectToJson(inputs))
     let buildParms: BuildParms
