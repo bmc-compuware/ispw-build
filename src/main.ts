@@ -70,7 +70,7 @@ export async function run(): Promise<void> {
 
     if (isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) {
       //for token
-      console.log('Using ces_token as authentication method')
+      console.log('Using ces_token as authentication method.')
       await utils
         .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
         .then(
@@ -109,7 +109,7 @@ export async function run(): Promise<void> {
         )
     } else {
       //for certi
-      console.log('Using ces_token as authentication method')
+      console.log('Using certificate as authentication method.')
       await utils
         .getHttpPostPromiseWithCert(reqUrl, inputs.certificate, host, port, reqBodyObj)
         .then(

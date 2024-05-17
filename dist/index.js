@@ -139,7 +139,7 @@ function run() {
                     }
                     if (!isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) return [3 /*break*/, 2];
                     //for token
-                    console.log('Using ces_token as authentication method');
+                    console.log('Using ces_token as authentication method.');
                     return [4 /*yield*/, utils
                             .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
                             .then(function (response) {
@@ -172,7 +172,7 @@ function run() {
                     return [3 /*break*/, 4];
                 case 2:
                     //for certi
-                    console.log('Using ces_token as authentication method');
+                    console.log('Using certificate as authentication method.');
                     return [4 /*yield*/, utils
                             .getHttpPostPromiseWithCert(reqUrl, inputs.certificate, host, port, reqBodyObj)
                             .then(function (response) {
