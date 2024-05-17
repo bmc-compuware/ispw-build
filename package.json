@@ -38,7 +38,8 @@
     "@types/lodash": "^4.14.169",
     "axios": "^0.21.1",
     "path": "^0.12.7",
-    "react-tinder-card": "^1.6.4"
+    "react-tinder-card": "^1.6.4",
+    "typescript-eslint": "^7.9.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.15",
