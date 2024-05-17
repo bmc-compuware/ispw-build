@@ -110,7 +110,6 @@ function run() {
                         'change_type',
                         'execution_status'
                     ];
-                    console.log('dev workflow - certi added');
                     inputs = utils.retrieveInputs(core, keys);
                     core.debug('Code Pipeline: parsed inputs: ' + utils.convertObjectToJson(inputs));
                     buildParms = void 0;
@@ -119,7 +118,7 @@ function run() {
                         buildParms = utils.parseStringAsJson(inputs.build_automatically);
                     }
                     else {
-                        console.log('Build parameters are being retrieved from the inputs3.');
+                        console.log('Build parameters are being retrieved from the inputs.');
                         buildParms = getParmsFromInputs(inputs.task_id);
                     }
                     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
@@ -138,13 +137,9 @@ function run() {
                     if (buildParms.taskIds) {
                         console.log('Starting the build process for task ' + buildParms.taskIds.toString());
                     }
-                    console.log('print certi ' + inputs.certificate.toString());
-                    console.log('print srid ' + inputs.srid.toString());
-                    console.log('print host ' + host.toString());
-                    console.log('print port ' + port.toString());
                     if (!isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) return [3 /*break*/, 2];
                     //for token
-                    console.log('print for token');
+                    console.log('Using ces_token as authentication method');
                     return [4 /*yield*/, utils
                             .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
                             .then(function (response) {
@@ -177,7 +172,7 @@ function run() {
                     return [3 /*break*/, 4];
                 case 2:
                     //for certi
-                    console.log('print for certi flow start');
+                    console.log('Using ces_token as authentication method');
                     return [4 /*yield*/, utils
                             .getHttpPostPromiseWithCert(reqUrl, inputs.certificate, host, port, reqBodyObj)
                             .then(function (response) {

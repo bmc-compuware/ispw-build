@@ -28,7 +28,6 @@ export async function run(): Promise<void> {
       'execution_status'
     ]
 
-    console.log('dev workflow - certi added');
     const inputs = utils.retrieveInputs(core, keys) as Inputs
     core.debug('Code Pipeline: parsed inputs: ' + utils.convertObjectToJson(inputs))
     let buildParms: BuildParms
@@ -37,7 +36,7 @@ export async function run(): Promise<void> {
 
       buildParms = utils.parseStringAsJson(inputs.build_automatically) as BuildParms
     } else {
-      console.log('Build parameters are being retrieved from the inputs3.')
+      console.log('Build parameters are being retrieved from the inputs.')
       buildParms = getParmsFromInputs(inputs.task_id)
     }
     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms))
@@ -54,9 +53,9 @@ export async function run(): Promise<void> {
     core.debug('Code Pipeline: request url: ' + reqUrl.href)
 
     // getting host port details from srid passed
-    const hostAndPort = inputs.srid.split('-');
-    const host = hostAndPort[0];
-    const port = hostAndPort[1];
+    const hostAndPort = inputs.srid.split('-')
+    const host = hostAndPort[0]
+    const port = hostAndPort[1]
 
     const reqBodyObj: CesRequestBody = assembleRequestBodyObject(
       inputs.runtime_configuration,
@@ -69,92 +68,85 @@ export async function run(): Promise<void> {
       console.log('Starting the build process for task ' + buildParms.taskIds.toString())
     }
 
-
-    console.log('print certi ' + inputs.certificate.toString())
-    console.log('print srid ' + inputs.srid.toString())
-    console.log('print host ' + host.toString())
-    console.log('print port ' + port.toString())
-
-    if(isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) {
+    if (isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) {
       //for token
-      console.log('print for token')
+      console.log('Using ces_token as authentication method')
       await utils
-      .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
-      .then(
-        (response: any) => {
-          core.debug('Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data))
-          // build could have passed or failed
-          setOutputs(response.data)
-          return handleResponseBody(response.data)
-        },
-        (error: any) => {
-          // there was a problem with the request to CES
-          if (error.response !== undefined) {
-            core.debug('Code Pipeline: received error code: ' + error.response.status)
+        .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
+        .then(
+          (response: any) => {
             core.debug(
-              'Code Pipeline: received error response body: ' +
-                utils.convertObjectToJson(error.response.data)
+              'Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data)
             )
-            setOutputs(error.response.data)
-            if (error.response.data) {
-              throw new GenerateFailureException(error.response.data.message)
+            // build could have passed or failed
+            setOutputs(response.data)
+            return handleResponseBody(response.data)
+          },
+          (error: any) => {
+            // there was a problem with the request to CES
+            if (error.response !== undefined) {
+              core.debug('Code Pipeline: received error code: ' + error.response.status)
+              core.debug(
+                'Code Pipeline: received error response body: ' +
+                  utils.convertObjectToJson(error.response.data)
+              )
+              setOutputs(error.response.data)
+              if (error.response.data) {
+                throw new GenerateFailureException(error.response.data.message)
+              } else {
+                throw new GenerateFailureException('There was a problem with the request to CES')
+              }
             }
-            else {
-              throw new GenerateFailureException('There was a problem with the request to CES')
-            }
+            throw error
           }
-          throw error
-        }
-      )
-      .then(
-        () => console.log('The build request completed successfully.'),
-        (error: any) => {
-          core.debug(error.stack)
-          core.setFailed(error.message)
-        }
-      )
-
-    }else {
+        )
+        .then(
+          () => console.log('The build request completed successfully.'),
+          (error: any) => {
+            core.debug(error.stack)
+            core.setFailed(error.message)
+          }
+        )
+    } else {
       //for certi
-      console.log('print for certi flow start')
+      console.log('Using ces_token as authentication method')
       await utils
-      .getHttpPostPromiseWithCert(reqUrl, inputs.certificate, host, port, reqBodyObj)
-      .then(
-        (response: any) => {
-          core.debug('Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data))
-          // build could have passed or failed
-          setOutputs(response.data)
-          return handleResponseBody(response.data)
-        },
-        (error: any) => {
-          // there was a problem with the request to CES
-          if (error.response !== undefined) {
-            core.debug('Code Pipeline: received error code: ' + error.response.status)
+        .getHttpPostPromiseWithCert(reqUrl, inputs.certificate, host, port, reqBodyObj)
+        .then(
+          (response: any) => {
             core.debug(
-              'Code Pipeline: received error response body: ' +
-                utils.convertObjectToJson(error.response.data)
+              'Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data)
             )
-            setOutputs(error.response.data)
-            if (error.response.data) {
-              throw new GenerateFailureException(error.response.data.message)
+            // build could have passed or failed
+            setOutputs(response.data)
+            return handleResponseBody(response.data)
+          },
+          (error: any) => {
+            // there was a problem with the request to CES
+            if (error.response !== undefined) {
+              core.debug('Code Pipeline: received error code: ' + error.response.status)
+              core.debug(
+                'Code Pipeline: received error response body: ' +
+                  utils.convertObjectToJson(error.response.data)
+              )
+              setOutputs(error.response.data)
+              if (error.response.data) {
+                throw new GenerateFailureException(error.response.data.message)
+              } else {
+                throw new GenerateFailureException('There was a problem with the request to CES')
+              }
             }
-            else {
-              throw new GenerateFailureException('There was a problem with the request to CES')
-            }
+            throw error
           }
-          throw error
-        }
-      )
-      .then(
-        () => console.log('The build request completed successfully.'),
-        (error: any) => {
-          core.debug(error.stack)
-          core.setFailed(error.message)
-        }
-      )
-
+        )
+        .then(
+          () => console.log('The build request completed successfully.'),
+          (error: any) => {
+            core.debug(error.stack)
+            core.setFailed(error.message)
+          }
+        )
     }
-
   } catch (error: any) {
     if (error instanceof MissingArgumentException) {
       // this would occur if there was nothing to load during the sync process
@@ -296,11 +288,11 @@ export function getBuildAwaitUrlPath(srid: string, buildParms: BuildParms) {
  */
 export function isAuthTokenOrCerti(cesToken: string, certificate: string) {
   if (utils.stringHasContent(cesToken)) {
-    return true;
+    return true
   } else if (utils.stringHasContent(certificate)) {
-    return false;
+    return false
   } else {
-    return undefined;
+    return undefined
   }
 }
 

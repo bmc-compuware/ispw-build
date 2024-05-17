@@ -52,4 +52,4 @@ outputs:
     description: 'the JSON output from build'
 runs:
   using: 'node12'
-  main: 'dist/index.js' 
+  main: 'dist/index.js'

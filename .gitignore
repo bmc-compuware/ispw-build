@@ -1,5 +1,6 @@
 node_modules
 .nyc_output
+lib/**/*
 __tests__/runner/*
 coverage
 logs

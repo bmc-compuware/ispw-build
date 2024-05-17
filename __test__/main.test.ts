@@ -17,7 +17,7 @@ describe('entity tests', () => {
       task_id: '7E53CC8FB3D6, 7E53CC8FB3D6, 7E53CC8FB3D6',
       ces_url: 'http://localhost:48226/',
       ces_token: 'token1',
-      certificate: '',
+      certificate: 'certi1',
       srid: 'srid1',
       runtime_configuration: 'ISPW',
       change_type: 'T',
