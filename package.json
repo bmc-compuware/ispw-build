@@ -4,7 +4,7 @@
   "description": "Code Pipeline github action build",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc && ncc build -o dist",
+    "build": "tsc && ncc build dist/ispw-build.js",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts --fix",
@@ -52,6 +52,7 @@
     "js-yaml": "^3.14.0",
     "prettier": "2.2.1",
     "ts-jest": "^26.4.4",
+    "ts-node": "^10.9.2",
     "typescript": "^4.1.3"
   }
 }

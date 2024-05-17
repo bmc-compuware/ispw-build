@@ -27,6 +27,7 @@ export async function run(): Promise<void> {
       'execution_status'
     ]
 
+    console.log('dev workflow');
     const inputs = utils.retrieveInputs(core, keys) as Inputs
     core.debug('Code Pipeline: parsed inputs: ' + utils.convertObjectToJson(inputs))
     let buildParms: BuildParms
@@ -35,7 +36,7 @@ export async function run(): Promise<void> {
 
       buildParms = utils.parseStringAsJson(inputs.build_automatically) as BuildParms
     } else {
-      console.log('Build parameters are being retrieved from the inputs1.')
+      console.log('Build parameters are being retrieved from the inputs check2.')
       buildParms = getParmsFromInputs(inputs.task_id)
     }
     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms))
@@ -98,7 +99,7 @@ export async function run(): Promise<void> {
         }
       )
 
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof MissingArgumentException) {
       // this would occur if there was nothing to load during the sync process
       // no need to fail the action if the generate is never attempted
