@@ -1,6 +1,6 @@
 {
   "name": "code-pipeline-build",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Code Pipeline github action build",
   "main": "./dist/index.js",
   "scripts": {
