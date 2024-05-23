@@ -9,6 +9,7 @@
 export interface Inputs {
   ces_url: string
   ces_token: string
+  certificate: string
   srid: string
   runtime_configuration?: string
   build_automatically?: string

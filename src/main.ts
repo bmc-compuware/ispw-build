@@ -21,6 +21,7 @@ export async function run(): Promise<void> {
       'task_id',
       'ces_url',
       'ces_token',
+      'certificate',
       'srid',
       'runtime_configuration',
       'change_type',
@@ -51,6 +52,11 @@ export async function run(): Promise<void> {
     const reqUrl: URL = utils.assembleRequestUrl(inputs.ces_url, reqPath)
     core.debug('Code Pipeline: request url: ' + reqUrl.href)
 
+    // getting host port details from srid passed
+    const hostAndPort = inputs.srid.split('-')
+    const host = hostAndPort[0]
+    const port = hostAndPort[1]
+
     const reqBodyObj: CesRequestBody = assembleRequestBodyObject(
       inputs.runtime_configuration,
       inputs.change_type,
@@ -62,43 +68,86 @@ export async function run(): Promise<void> {
       console.log('Starting the build process for task ' + buildParms.taskIds.toString())
     }
 
-    await utils
-      .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
-      .then(
-        (response: any) => {
-          core.debug('Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data))
-          // build could have passed or failed
-          setOutputs(response.data)
-          return handleResponseBody(response.data)
-        },
-        (error: any) => {
-          // there was a problem with the request to CES
-          if (error.response !== undefined) {
-            core.debug('Code Pipeline: received error code: ' + error.response.status)
+    if (isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) {
+      //for token
+      console.log('Using ces_token as authentication method.')
+      await utils
+        .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
+        .then(
+          (response: any) => {
             core.debug(
-              'Code Pipeline: received error response body: ' +
-                utils.convertObjectToJson(error.response.data)
+              'Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data)
             )
-            setOutputs(error.response.data)
-            if (error.response.data) {
-              throw new GenerateFailureException(error.response.data.message)
+            // build could have passed or failed
+            setOutputs(response.data)
+            return handleResponseBody(response.data)
+          },
+          (error: any) => {
+            // there was a problem with the request to CES
+            if (error.response !== undefined) {
+              core.debug('Code Pipeline: received error code: ' + error.response.status)
+              core.debug(
+                'Code Pipeline: received error response body: ' +
+                  utils.convertObjectToJson(error.response.data)
+              )
+              setOutputs(error.response.data)
+              if (error.response.data) {
+                throw new GenerateFailureException(error.response.data.message)
+              } else {
+                throw new GenerateFailureException('There was a problem with the request to CES')
+              }
             }
-            else {
-              throw new GenerateFailureException('There was a problem with the request to CES')
-            }
+            throw error
           }
-          throw error
-        }
-      )
-      .then(
-        () => console.log('The build request completed successfully.'),
-        (error: any) => {
-          core.debug(error.stack)
-          core.setFailed(error.message)
-        }
-      )
-
-  } catch (error) {
+        )
+        .then(
+          () => console.log('The build request completed successfully.'),
+          (error: any) => {
+            core.debug(error.stack)
+            core.setFailed(error.message)
+          }
+        )
+    } else {
+      //for certi
+      console.log('Using certificate as authentication method.')
+      await utils
+        .getHttpPostPromiseWithCert(reqUrl, inputs.certificate, host, port, reqBodyObj)
+        .then(
+          (response: any) => {
+            core.debug(
+              'Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data)
+            )
+            // build could have passed or failed
+            setOutputs(response.data)
+            return handleResponseBody(response.data)
+          },
+          (error: any) => {
+            // there was a problem with the request to CES
+            if (error.response !== undefined) {
+              core.debug('Code Pipeline: received error code: ' + error.response.status)
+              core.debug(
+                'Code Pipeline: received error response body: ' +
+                  utils.convertObjectToJson(error.response.data)
+              )
+              setOutputs(error.response.data)
+              if (error.response.data) {
+                throw new GenerateFailureException(error.response.data.message)
+              } else {
+                throw new GenerateFailureException('There was a problem with the request to CES')
+              }
+            }
+            throw error
+          }
+        )
+        .then(
+          () => console.log('The build request completed successfully.'),
+          (error: any) => {
+            core.debug(error.stack)
+            core.setFailed(error.message)
+          }
+        )
+    }
+  } catch (error: any) {
     if (error instanceof MissingArgumentException) {
       // this would occur if there was nothing to load during the sync process
       // no need to fail the action if the generate is never attempted
@@ -227,6 +276,24 @@ export function getBuildAwaitUrlPath(srid: string, buildParms: BuildParms) {
   }
   tempUrlStr = tempUrlStr.slice(0, -1)
   return tempUrlStr
+}
+
+/**
+ * Checks which authentication method is used in workflow i.e. token or certi
+ * @param  {string} cesToken the ces_token for authentication
+ * @param  {string} certificate the certificate passed for authentication
+ * @return {boolean} which authentication is passed in workflow i.e token or certi
+ * true for token
+ * false for certi
+ */
+export function isAuthTokenOrCerti(cesToken: string, certificate: string) {
+  if (utils.stringHasContent(cesToken)) {
+    return true
+  } else if (utils.stringHasContent(certificate)) {
+    return false
+  } else {
+    return undefined
+  }
 }
 
 /**

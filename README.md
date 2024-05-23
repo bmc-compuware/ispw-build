@@ -42,7 +42,7 @@ jobs:
         run: echo "The number of generate failures is ${{ steps.build.outputs.generate_failed_count }}"
 ```
 
-The following example will generate two specific Code Pipeline tasks 
+The following example will generate two specific Code Pipeline tasks using ces_token as authentication method
 
 ``` yaml
 on: [push]
@@ -65,18 +65,48 @@ jobs:
         run: echo "The Code Pipeline set used for the build is ${{ steps.build.outputs.set_id }}"
 ```
 
+The following example will generate two specific Code Pipeline tasks using certificate as authentication method
+
+``` yaml
+on: [push]
+
+jobs:
+  run-code-pipeline-build:
+    runs-on: [self-hosted, ubuntu-ispw]
+    name: A job to build source in Code Pipeline
+    steps:
+      - name: Build
+        uses: bmc-compuware/ispw-build@v1
+        id: build
+        with:
+          ces_url: "https://CES:48226/"
+          certificate: ${{ secrets.certificate }}
+          srid: host-37733
+          runtime_configuration: ISPW
+          task_id: "7E3A5B274D24,7E3A5B274EFA"
+      - name: Get the set ID for the build
+        run: echo "The Code Pipeline set used for the build is ${{ steps.build.outputs.set_id }}"
+```
+
 ## Inputs
 
 | Input name | Required | Description |
 | ---------- | -------- | ----------- |
 | `ces_url` | Required | The URL to use when connecting to CES |
-| `ces_token` | Required | The token to use when authenticating the request to CES |
 | `srid` | Required | The SRID of the Code Pipeline instance to connect to |
 | `change_type` | Optional | The change type of this request. The default value is 'S' for standard. |
 | `execution_status` | Optional | The flag to indicate whether the build should happen immediately, or should be held. The default is 'I' for immediate. Other possible value is 'H' for hold. |
 | `runtime_configuration` | Optional | The runtime configuration for the instance of Code Pipeline you are connecting to. |
 | `build_automatically` | Optional | A string of JSON that contains the parameters for the build. If using a Code Pipeline Sync or Code Pipeline Sync Local step before the build, this JSON string can be retrieved from the outputs of that step. If `build_automatically` is not being used, then the task_id must be specified. |
 | `task_id` | Optional | The comma-separated string of task IDs for the tasks that need to be built. Do not use if `build_automatically` has already been specified.|
+
+| `ces_token` | Optional | The token to use when authenticating the request to CES |
+| `certificate` | Optional | The certificate to use when authenticating the request to CES |
+
+## NOTE
+
+Users must pass one of the authentication method in workflow i.e ces_token or certificate.
+
 
 ## Outputs
 
@@ -121,6 +151,17 @@ From the Security page in CES, copy the token. In GitHub go to Settings > Secret
 On the New Secret page, paste the token that was copied earlier and click the Add secret button. Make a note of the name you give the secret so that you can easily use it in your workflow script.
 
 ![Saving secret](media/github-saving-secret.png)
+
+### Save the certificate as a GitHub Secret
+
+Once you get the certificate, copy the 64bit text without and line breaks. In GitHub go to Settings > Secrets and click the button for New Repository Secret.
+
+![Secrets page](media/github-secrets-settings.png)
+
+On the New Secret page, paste the certificate that was copied earlier and click the Add secret button. Make a note of the name you give the secret so that you can easily use it in your workflow script.
+
+![Saving secret](media/github-saving-certificate.png)
+
 
 ### Fill in the workflow script
 

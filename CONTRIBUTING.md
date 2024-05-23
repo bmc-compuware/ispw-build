@@ -18,6 +18,10 @@ Once all the necessary setup has been completed, you are ready to begin changing
 
 The main script for the action is in `src/main.ts`. That is the entry point for the code to start executing, so only code called by the main script will be executed.
 
+Once you make neccessary changes to main.ts you need to complie it and push the compiled index.js file to remote repo so you change will reflect in workflow. 
+
+To compile src/main.ts into dist/index.js correctly make sure package.json has "build": "tsc && ncc build dist/ispw-build.js" under scripts. Do not push main.js/main.js.map to remote repo.
+
 Utility functions are stored in the `src/utils/CommonUtils.ts` file. Also, if you add a utility function be sure to write an automated test for it, and add the test to `__test__/*.test.js`.
 
 Keep in mind that JavaScript files do not need to be compiled before they are run.
