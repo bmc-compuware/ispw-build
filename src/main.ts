@@ -41,7 +41,7 @@ export async function run(): Promise<void> {
     }
     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms))
 
-    const requiredFields = [""];
+    const requiredFields = ['taskIds']
     if (!utils.validateBuildParms(buildParms, requiredFields)) {
       throw new MissingArgumentException(
         'Inputs required for Code Pipeline Build are missing. ' + '\nSkipping the build request....'
@@ -64,7 +64,7 @@ export async function run(): Promise<void> {
     )
     core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj))
 
-    if (buildParms.taskIds) {
+    if (buildParms.taskIds && buildParms.taskIds.length > 0) {
       console.log('Starting the build process for task ' + buildParms.taskIds.toString())
     }
 
@@ -269,7 +269,7 @@ export function assembleRequestBodyObject(
  */
 export function getBuildAwaitUrlPath(srid: string, buildParms: BuildParms) {
   let tempUrlStr = `/ispw/${srid}/build-await?`
-  if (utils.stringHasContent(buildParms.taskIds)) {
+  if (buildParms.taskIds && buildParms.taskIds.length > 0) {
     buildParms.taskIds.forEach(id => {
       tempUrlStr = tempUrlStr.concat(`taskId=${id}&`)
     })
@@ -277,7 +277,6 @@ export function getBuildAwaitUrlPath(srid: string, buildParms: BuildParms) {
   tempUrlStr = tempUrlStr.slice(0, -1)
   return tempUrlStr
 }
- 
 
 /**
  * Checks which authentication method is used in workflow i.e. token or certi

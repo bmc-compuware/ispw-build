@@ -115,7 +115,7 @@ function run() {
                         buildParms = getParmsFromInputs(inputs.task_id);
                     }
                     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
-                    requiredFields = [""];
+                    requiredFields = ['taskIds'];
                     if (!utils.validateBuildParms(buildParms, requiredFields)) {
                         throw new MissingArgumentException('Inputs required for Code Pipeline Build are missing. ' + '\nSkipping the build request....');
                     }
@@ -127,7 +127,7 @@ function run() {
                     port = hostAndPort[1];
                     reqBodyObj = assembleRequestBodyObject(inputs.runtime_configuration, inputs.change_type, inputs.execution_status);
                     core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj));
-                    if (buildParms.taskIds) {
+                    if (buildParms.taskIds && buildParms.taskIds.length > 0) {
                         console.log('Starting the build process for task ' + buildParms.taskIds.toString());
                     }
                     if (!isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) return [3 /*break*/, 2];
@@ -318,7 +318,7 @@ exports.assembleRequestBodyObject = assembleRequestBodyObject;
  */
 function getBuildAwaitUrlPath(srid, buildParms) {
     var tempUrlStr = "/ispw/".concat(srid, "/build-await?");
-    if (utils.stringHasContent(buildParms.taskIds)) {
+    if (buildParms.taskIds && buildParms.taskIds.length > 0) {
         buildParms.taskIds.forEach(function (id) {
             tempUrlStr = tempUrlStr.concat("taskId=".concat(id, "&"));
         });
