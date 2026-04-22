@@ -127,7 +127,7 @@ function run() {
                     port = hostAndPort[1];
                     reqBodyObj = assembleRequestBodyObject(inputs.runtime_configuration, inputs.change_type, inputs.execution_status);
                     core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj));
-                    if (buildParms.taskIds && buildParms.taskIds.length > 0) {
+                    if (buildParms.taskIds) {
                         console.log('Starting the build process for task ' + buildParms.taskIds.toString());
                     }
                     if (!isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) return [3 /*break*/, 2];
@@ -318,7 +318,7 @@ exports.assembleRequestBodyObject = assembleRequestBodyObject;
  */
 function getBuildAwaitUrlPath(srid, buildParms) {
     var tempUrlStr = "/ispw/".concat(srid, "/build-await?");
-    if (buildParms.taskIds && buildParms.taskIds.length > 0) {
+    if (buildParms.taskIds) {
         buildParms.taskIds.forEach(function (id) {
             tempUrlStr = tempUrlStr.concat("taskId=".concat(id, "&"));
         });

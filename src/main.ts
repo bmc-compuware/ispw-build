@@ -64,7 +64,7 @@ export async function run(): Promise<void> {
     )
     core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj))
 
-    if (buildParms.taskIds && buildParms.taskIds.length > 0) {
+    if (buildParms.taskIds) {
       console.log('Starting the build process for task ' + buildParms.taskIds.toString())
     }
 
@@ -269,7 +269,7 @@ export function assembleRequestBodyObject(
  */
 export function getBuildAwaitUrlPath(srid: string, buildParms: BuildParms) {
   let tempUrlStr = `/ispw/${srid}/build-await?`
-  if (buildParms.taskIds && buildParms.taskIds.length > 0) {
+  if (buildParms.taskIds) {
     buildParms.taskIds.forEach(id => {
       tempUrlStr = tempUrlStr.concat(`taskId=${id}&`)
     })
