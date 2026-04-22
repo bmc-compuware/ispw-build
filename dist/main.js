@@ -87,7 +87,7 @@ var core = __importStar(require("@actions/core"));
 var utils = require('@bmc-compuware/ispw-action-utilities');
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var keys, inputs, buildParms, requiredFields, reqPath, reqUrl, hostAndPort, host, port, reqBodyObj, error_1;
+        var keys, inputs, buildParms, reqPath, reqUrl, hostAndPort, host, port, reqBodyObj, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -115,10 +115,6 @@ function run() {
                         buildParms = getParmsFromInputs(inputs.task_id);
                     }
                     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
-                    requiredFields = ['taskIds'];
-                    if (!utils.validateBuildParms(buildParms, requiredFields)) {
-                        throw new MissingArgumentException('Inputs required for Code Pipeline Build are missing. ' + '\nSkipping the build request....');
-                    }
                     reqPath = getBuildAwaitUrlPath(inputs.srid, buildParms);
                     reqUrl = utils.assembleRequestUrl(inputs.ces_url, reqPath);
                     core.debug('Code Pipeline: request url: ' + reqUrl.href);
@@ -127,7 +123,7 @@ function run() {
                     port = hostAndPort[1];
                     reqBodyObj = assembleRequestBodyObject(inputs.runtime_configuration, inputs.change_type, inputs.execution_status);
                     core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj));
-                    if (buildParms.taskIds) {
+                    if (buildParms.taskIds && buildParms.taskIds.length > 0) {
                         console.log('Starting the build process for task ' + buildParms.taskIds.toString());
                     }
                     if (!isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) return [3 /*break*/, 2];
@@ -318,12 +314,13 @@ exports.assembleRequestBodyObject = assembleRequestBodyObject;
  */
 function getBuildAwaitUrlPath(srid, buildParms) {
     var tempUrlStr = "/ispw/".concat(srid, "/build-await?");
-    if (buildParms.taskIds) {
+    if (buildParms.taskIds && buildParms.taskIds.length > 0) {
         buildParms.taskIds.forEach(function (id) {
             tempUrlStr = tempUrlStr.concat("taskId=".concat(id, "&"));
         });
     }
     tempUrlStr = tempUrlStr.slice(0, -1);
+    console.log("checking tempURlStr" + tempUrlStr);
     return tempUrlStr;
 }
 exports.getBuildAwaitUrlPath = getBuildAwaitUrlPath;

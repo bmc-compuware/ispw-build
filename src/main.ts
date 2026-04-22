@@ -41,12 +41,12 @@ export async function run(): Promise<void> {
     }
     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms))
 
-    const requiredFields = ['taskIds']
+    /*const requiredFields = ['taskIds']
     if (!utils.validateBuildParms(buildParms, requiredFields)) {
       throw new MissingArgumentException(
         'Inputs required for Code Pipeline Build are missing. ' + '\nSkipping the build request....'
       )
-    }
+    }*/
 
     const reqPath: string = getBuildAwaitUrlPath(inputs.srid, buildParms)
     const reqUrl: URL = utils.assembleRequestUrl(inputs.ces_url, reqPath)
@@ -64,7 +64,7 @@ export async function run(): Promise<void> {
     )
     core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj))
 
-    if (buildParms.taskIds) {
+    if (buildParms.taskIds && buildParms.taskIds.length > 0){
       console.log('Starting the build process for task ' + buildParms.taskIds.toString())
     }
 
@@ -269,12 +269,13 @@ export function assembleRequestBodyObject(
  */
 export function getBuildAwaitUrlPath(srid: string, buildParms: BuildParms) {
   let tempUrlStr = `/ispw/${srid}/build-await?`
-  if (buildParms.taskIds) {
+  if (buildParms.taskIds  && buildParms.taskIds.length > 0) {
     buildParms.taskIds.forEach(id => {
       tempUrlStr = tempUrlStr.concat(`taskId=${id}&`)
     })
   }
   tempUrlStr = tempUrlStr.slice(0, -1)
+  console.log("checking tempURlStr" + tempUrlStr)
   return tempUrlStr
 }
 
