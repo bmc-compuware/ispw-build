@@ -42,12 +42,12 @@ export async function run(): Promise<void> {
     }
     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms))
 
-    const requiredFields = ['containerId', 'taskLevel'];
+    /*const requiredFields = ['containerId', 'taskLevel'];
     if (!utils.validateBuildParms(buildParms, requiredFields)) {
       throw new MissingArgumentException(
         'Inputs required for Code Pipeline Build are missing. ' + '\nSkipping the build request....'
       )
-    }
+    }*/
 
     const reqPath: string = getBuildAwaitUrlPath(inputs.srid, buildParms)
     const reqUrl: URL = utils.assembleRequestUrl(inputs.ces_url, reqPath)

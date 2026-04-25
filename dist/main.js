@@ -87,7 +87,7 @@ var core = __importStar(require("@actions/core"));
 var utils = require('@bmc-compuware/ispw-action-utilities');
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var keys, inputs_1, buildParms, requiredFields, reqPath, reqUrl, hostAndPort, host, port, reqBodyObj, error_1;
+        var keys, inputs_1, buildParms, reqPath, reqUrl, hostAndPort, host, port, reqBodyObj, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -116,10 +116,6 @@ function run() {
                         buildParms = getParmsFromInputs(inputs_1.task_id);
                     }
                     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
-                    requiredFields = ['containerId', 'taskLevel'];
-                    if (!utils.validateBuildParms(buildParms, requiredFields)) {
-                        throw new MissingArgumentException('Inputs required for Code Pipeline Build are missing. ' + '\nSkipping the build request....');
-                    }
                     reqPath = getBuildAwaitUrlPath(inputs_1.srid, buildParms);
                     reqUrl = utils.assembleRequestUrl(inputs_1.ces_url, reqPath);
                     core.debug('Code Pipeline: request url: ' + reqUrl.href);
