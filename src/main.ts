@@ -23,9 +23,10 @@ export async function run(): Promise<void> {
       'ces_token',
       'certificate',
       'srid',
+      'level',
       'runtime_configuration',
       'change_type',
-      'execution_status'
+      'execution_status'      
     ]
 
     const inputs = utils.retrieveInputs(core, keys) as Inputs
@@ -41,12 +42,12 @@ export async function run(): Promise<void> {
     }
     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms))
 
-    /*const requiredFields = ['taskIds']
+    const requiredFields = ['containerId', 'taskLevel'];
     if (!utils.validateBuildParms(buildParms, requiredFields)) {
       throw new MissingArgumentException(
         'Inputs required for Code Pipeline Build are missing. ' + '\nSkipping the build request....'
       )
-    }*/
+    }
 
     const reqPath: string = getBuildAwaitUrlPath(inputs.srid, buildParms)
     const reqUrl: URL = utils.assembleRequestUrl(inputs.ces_url, reqPath)
@@ -100,13 +101,24 @@ export async function run(): Promise<void> {
             throw error
           }
         )
-        .then(
-          () => console.log('The build request completed successfully.'),
-          (error: any) => {
-            core.debug(error.stack)
-            core.setFailed(error.message)
+        .then((response: any) => {
+          console.log('The Build request submitted successfully.');
+          if (inputs.execution_status === 'I' || inputs.execution_status === '') {
+            core.debug(
+                'Code Pipeline: Execution completed successfully.');
+            const setUrl: URL   = response.url;
+            const setId: string = response.setId;
+            if (setId) {
+              utils.pollSetStatus(setUrl, setId, inputs.ces_token, 'Build',
+                  2000, 60000, inputs.level, inputs.srid,
+                  inputs.runtime_configuration, inputs.ces_url, core);
+            }
           }
-        )
+        },
+        (error: any) => {
+          core.debug(error.stack);
+          core.setFailed(error.message);
+        });
     } else {
       //for certi
       console.log('Using certificate as authentication method.')
@@ -139,13 +151,24 @@ export async function run(): Promise<void> {
             throw error
           }
         )
-        .then(
-          () => console.log('The build request completed successfully.'),
-          (error: any) => {
-            core.debug(error.stack)
-            core.setFailed(error.message)
+        .then((response: any) => {
+          console.log('The Generate request submitted successfully.');
+          if (inputs.execution_status === 'I' || inputs.execution_status === '') {
+            core.debug(
+                'Code Pipeline: Execution completed successfully.');
+            const setUrl: URL   = response.url;
+            const setId: string = response.setId;
+            if (setId) {
+              utils.pollSetStatus(setUrl, setId, inputs.ces_token, 'Generate',
+                  2000, 60000, inputs.level, inputs.srid,
+                  inputs.runtime_configuration, inputs.ces_url, core);
+            }
           }
-        )
+        },
+        (error : any) => {
+          core.debug(error.stack);
+          core.setFailed(error.message);
+        });
     }
   } catch (error: any) {
     if (error instanceof MissingArgumentException) {

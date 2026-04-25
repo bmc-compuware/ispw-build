@@ -87,7 +87,7 @@ var core = __importStar(require("@actions/core"));
 var utils = require('@bmc-compuware/ispw-action-utilities');
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var keys, inputs, buildParms, reqPath, reqUrl, hostAndPort, host, port, reqBodyObj, error_1;
+        var keys, inputs_1, buildParms, requiredFields, reqPath, reqUrl, hostAndPort, host, port, reqBodyObj, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -99,38 +99,43 @@ function run() {
                         'ces_token',
                         'certificate',
                         'srid',
+                        'level',
                         'runtime_configuration',
                         'change_type',
                         'execution_status'
                     ];
-                    inputs = utils.retrieveInputs(core, keys);
-                    core.debug('Code Pipeline: parsed inputs: ' + utils.convertObjectToJson(inputs));
+                    inputs_1 = utils.retrieveInputs(core, keys);
+                    core.debug('Code Pipeline: parsed inputs: ' + utils.convertObjectToJson(inputs_1));
                     buildParms = void 0;
-                    if (utils.stringHasContent(inputs.build_automatically)) {
+                    if (utils.stringHasContent(inputs_1.build_automatically)) {
                         console.log('Build parameters are being retrieved from the build_automatically input.');
-                        buildParms = utils.parseStringAsJson(inputs.build_automatically);
+                        buildParms = utils.parseStringAsJson(inputs_1.build_automatically);
                     }
                     else {
                         console.log('Build parameters are being retrieved from the inputs.');
-                        buildParms = getParmsFromInputs(inputs.task_id);
+                        buildParms = getParmsFromInputs(inputs_1.task_id);
                     }
                     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
-                    reqPath = getBuildAwaitUrlPath(inputs.srid, buildParms);
-                    reqUrl = utils.assembleRequestUrl(inputs.ces_url, reqPath);
+                    requiredFields = ['containerId', 'taskLevel'];
+                    if (!utils.validateBuildParms(buildParms, requiredFields)) {
+                        throw new MissingArgumentException('Inputs required for Code Pipeline Build are missing. ' + '\nSkipping the build request....');
+                    }
+                    reqPath = getBuildAwaitUrlPath(inputs_1.srid, buildParms);
+                    reqUrl = utils.assembleRequestUrl(inputs_1.ces_url, reqPath);
                     core.debug('Code Pipeline: request url: ' + reqUrl.href);
-                    hostAndPort = inputs.srid.split('-');
+                    hostAndPort = inputs_1.srid.split('-');
                     host = hostAndPort[0];
                     port = hostAndPort[1];
-                    reqBodyObj = assembleRequestBodyObject(inputs.runtime_configuration, inputs.change_type, inputs.execution_status);
+                    reqBodyObj = assembleRequestBodyObject(inputs_1.runtime_configuration, inputs_1.change_type, inputs_1.execution_status);
                     core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj));
                     if (buildParms.taskIds && buildParms.taskIds.length > 0) {
                         console.log('Starting the build process for task ' + buildParms.taskIds.toString());
                     }
-                    if (!isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) return [3 /*break*/, 2];
+                    if (!isAuthTokenOrCerti(inputs_1.ces_token, inputs_1.certificate)) return [3 /*break*/, 2];
                     //for token
                     console.log('Using ces_token as authentication method.');
                     return [4 /*yield*/, utils
-                            .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
+                            .getHttpPostPromise(reqUrl, inputs_1.ces_token, reqBodyObj)
                             .then(function (response) {
                             core.debug('Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data));
                             // build could have passed or failed
@@ -152,7 +157,17 @@ function run() {
                             }
                             throw error;
                         })
-                            .then(function () { return console.log('The build request completed successfully.'); }, function (error) {
+                            .then(function (response) {
+                            console.log('The Build request submitted successfully.');
+                            if (inputs_1.execution_status === 'I' || inputs_1.execution_status === '') {
+                                core.debug('Code Pipeline: Execution completed successfully.');
+                                var setUrl = response.url;
+                                var setId = response.setId;
+                                if (setId) {
+                                    utils.pollSetStatus(setUrl, setId, inputs_1.ces_token, 'Build', 2000, 60000, inputs_1.level, inputs_1.srid, inputs_1.runtime_configuration, inputs_1.ces_url, core);
+                                }
+                            }
+                        }, function (error) {
                             core.debug(error.stack);
                             core.setFailed(error.message);
                         })];
@@ -163,7 +178,7 @@ function run() {
                     //for certi
                     console.log('Using certificate as authentication method.');
                     return [4 /*yield*/, utils
-                            .getHttpPostPromiseWithCert(reqUrl, inputs.certificate, host, port, reqBodyObj)
+                            .getHttpPostPromiseWithCert(reqUrl, inputs_1.certificate, host, port, reqBodyObj)
                             .then(function (response) {
                             core.debug('Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data));
                             // build could have passed or failed
@@ -185,7 +200,17 @@ function run() {
                             }
                             throw error;
                         })
-                            .then(function () { return console.log('The build request completed successfully.'); }, function (error) {
+                            .then(function (response) {
+                            console.log('The Generate request submitted successfully.');
+                            if (inputs_1.execution_status === 'I' || inputs_1.execution_status === '') {
+                                core.debug('Code Pipeline: Execution completed successfully.');
+                                var setUrl = response.url;
+                                var setId = response.setId;
+                                if (setId) {
+                                    utils.pollSetStatus(setUrl, setId, inputs_1.ces_token, 'Generate', 2000, 60000, inputs_1.level, inputs_1.srid, inputs_1.runtime_configuration, inputs_1.ces_url, core);
+                                }
+                            }
+                        }, function (error) {
                             core.debug(error.stack);
                             core.setFailed(error.message);
                         })];

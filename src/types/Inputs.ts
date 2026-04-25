@@ -7,6 +7,7 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 export interface Inputs {
+  level: string
   ces_url: string
   ces_token: string
   certificate: string
