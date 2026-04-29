@@ -126,7 +126,7 @@ jobs:
 | `build_automatically` | Optional | A string of JSON that contains the parameters for the build. If using a Code Pipeline Sync or Code Pipeline Sync Local step before the build, this JSON string can be retrieved from the outputs of that step. If `build_automatically` is not being used, then the `assignment_id` and `level` must be specified. |
 | `assignment_id` | Optional | The assignment for which you intend to build tasks. Do not use if `build_automatically` has already been specified. |
 | `level` | Optional | The level that the tasks exist at in the assignment. Do not use if `build_automatically` has already been specified. |
-| `task_id` | Optional | The comma-separated string of task IDs for the tasks that need to be built. Do not use if `build_automatically` has already been specified.  Otherwise, if not specified the action will build all the tasks at specified level in an assignment container.|
+| `task_id` | Optional | The comma-separated string of task IDs for the tasks that need to be built. Do not use if `build_automatically` has already been specified.|
 
 | `ces_token` | Optional | The token to use when authenticating the request to CES |
 | `certificate` | Optional | The certificate to use when authenticating the request to CES |
@@ -149,7 +149,7 @@ Users must pass one of the authentication method in workflow i.e ces_token or ce
 | `url` | string | The URL that can be used to retrieved information about the set that was used for processing. |
 | `assignment_id` | string | The assignment ID that can be used to retrieved information about the assignment that was used for processing. |
 | `output_json` | JSON | the JSON output from build |
-| `message` | string | The reason of failure of generate action. |
+| `message` | string | The reason of failure of build action. |
 
 ## Setup
 
