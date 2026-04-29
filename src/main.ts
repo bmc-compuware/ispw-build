@@ -23,6 +23,7 @@ export async function run(): Promise<void> {
       'ces_token',
       'certificate',
       'srid',
+      'assignment_id',
       'level',
       'runtime_configuration',
       'change_type',
@@ -38,16 +39,16 @@ export async function run(): Promise<void> {
       buildParms = utils.parseStringAsJson(inputs.build_automatically) as BuildParms
     } else {
       console.log('Build parameters are being retrieved from the inputs.')
-      buildParms = getParmsFromInputs(inputs.task_id)
+      buildParms = getParmsFromInputs(inputs.assignment_id, inputs.level, inputs.task_id)
     }
     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms))
 
-    /*const requiredFields = ['containerId', 'taskLevel'];
+    const requiredFields = ['containerId', 'taskLevel'];
     if (!utils.validateBuildParms(buildParms, requiredFields)) {
       throw new MissingArgumentException(
         'Inputs required for Code Pipeline Build are missing. ' + '\nSkipping the build request....'
       )
-    }*/
+    }
 
     const reqPath: string = getBuildAwaitUrlPath(inputs.srid, buildParms)
     const reqUrl: URL = utils.assembleRequestUrl(inputs.ces_url, reqPath)
@@ -159,7 +160,7 @@ export async function run(): Promise<void> {
             const setUrl: URL   = response.url;
             const setId: string = response.setId;
             if (setId) {
-              utils.pollSetStatus(setUrl, setId, inputs.ces_token, 'Generate',
+              utils.pollSetStatus(setUrl, setId, inputs.ces_token, 'Build',
                   2000, 60000, inputs.level, inputs.srid,
                   inputs.runtime_configuration, inputs.ces_url, core);
             }
@@ -191,8 +192,18 @@ export async function run(): Promise<void> {
  * @return {BuildParms} a BuildParms object with the fields filled in.
  * This will never return undefined.
  */
-export function getParmsFromInputs(inputTaskId: string | undefined): BuildParms {
+export function getParmsFromInputs(inputAssignment: string | undefined,
+  inputLevel: string | undefined,
+  inputTaskId: string | undefined): BuildParms {
   const buildParms: BuildParms = {}
+
+  if (utils.stringHasContent(inputAssignment)) {
+    buildParms.containerId = inputAssignment;
+  }
+
+  if (utils.stringHasContent(inputLevel)) {
+    buildParms.taskLevel = inputLevel;
+  }
   if (inputTaskId && utils.stringHasContent(inputTaskId)) {
     buildParms.taskIds = inputTaskId.split(',')
   }
@@ -292,13 +303,15 @@ export function assembleRequestBodyObject(
  */
 export function getBuildAwaitUrlPath(srid: string, buildParms: BuildParms) {
   let tempUrlStr = `/ispw/${srid}/build-await?`
+  tempUrlStr = tempUrlStr.concat(`level=${buildParms.taskLevel}`);
+  tempUrlStr = tempUrlStr.concat(`assignment_id=${buildParms.containerId}`);
   if (buildParms.taskIds  && buildParms.taskIds.length > 0) {
     buildParms.taskIds.forEach(id => {
       tempUrlStr = tempUrlStr.concat(`taskId=${id}&`)
     })
   }
-  tempUrlStr = tempUrlStr.slice(0, -1)
-  console.log("checking tempURlStr" + tempUrlStr)
+  //tempUrlStr = tempUrlStr.slice(0, -1)
+  console.log("checking tempURl  :: " + tempUrlStr)
   return tempUrlStr
 }
 

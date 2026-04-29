@@ -87,7 +87,7 @@ var core = __importStar(require("@actions/core"));
 var utils = require('@bmc-compuware/ispw-action-utilities');
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var keys, inputs_1, buildParms, reqPath, reqUrl, hostAndPort, host, port, reqBodyObj, error_1;
+        var keys, inputs_1, buildParms, requiredFields, reqPath, reqUrl, hostAndPort, host, port, reqBodyObj, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -99,6 +99,7 @@ function run() {
                         'ces_token',
                         'certificate',
                         'srid',
+                        'assignment_id',
                         'level',
                         'runtime_configuration',
                         'change_type',
@@ -113,9 +114,13 @@ function run() {
                     }
                     else {
                         console.log('Build parameters are being retrieved from the inputs.');
-                        buildParms = getParmsFromInputs(inputs_1.task_id);
+                        buildParms = getParmsFromInputs(inputs_1.assignment_id, inputs_1.level, inputs_1.task_id);
                     }
                     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
+                    requiredFields = ['containerId', 'taskLevel'];
+                    if (!utils.validateBuildParms(buildParms, requiredFields)) {
+                        throw new MissingArgumentException('Inputs required for Code Pipeline Build are missing. ' + '\nSkipping the build request....');
+                    }
                     reqPath = getBuildAwaitUrlPath(inputs_1.srid, buildParms);
                     reqUrl = utils.assembleRequestUrl(inputs_1.ces_url, reqPath);
                     core.debug('Code Pipeline: request url: ' + reqUrl.href);
@@ -203,7 +208,7 @@ function run() {
                                 var setUrl = response.url;
                                 var setId = response.setId;
                                 if (setId) {
-                                    utils.pollSetStatus(setUrl, setId, inputs_1.ces_token, 'Generate', 2000, 60000, inputs_1.level, inputs_1.srid, inputs_1.runtime_configuration, inputs_1.ces_url, core);
+                                    utils.pollSetStatus(setUrl, setId, inputs_1.ces_token, 'Build', 2000, 60000, inputs_1.level, inputs_1.srid, inputs_1.runtime_configuration, inputs_1.ces_url, core);
                                 }
                             }
                         }, function (error) {
@@ -241,8 +246,14 @@ exports.run = run;
  * @return {BuildParms} a BuildParms object with the fields filled in.
  * This will never return undefined.
  */
-function getParmsFromInputs(inputTaskId) {
+function getParmsFromInputs(inputAssignment, inputLevel, inputTaskId) {
     var buildParms = {};
+    if (utils.stringHasContent(inputAssignment)) {
+        buildParms.containerId = inputAssignment;
+    }
+    if (utils.stringHasContent(inputLevel)) {
+        buildParms.taskLevel = inputLevel;
+    }
     if (inputTaskId && utils.stringHasContent(inputTaskId)) {
         buildParms.taskIds = inputTaskId.split(',');
     }
@@ -335,13 +346,15 @@ exports.assembleRequestBodyObject = assembleRequestBodyObject;
  */
 function getBuildAwaitUrlPath(srid, buildParms) {
     var tempUrlStr = "/ispw/".concat(srid, "/build-await?");
+    tempUrlStr = tempUrlStr.concat("level=".concat(buildParms.taskLevel));
+    tempUrlStr = tempUrlStr.concat("assignment_id=".concat(buildParms.containerId));
     if (buildParms.taskIds && buildParms.taskIds.length > 0) {
         buildParms.taskIds.forEach(function (id) {
             tempUrlStr = tempUrlStr.concat("taskId=".concat(id, "&"));
         });
     }
-    tempUrlStr = tempUrlStr.slice(0, -1);
-    console.log("checking tempURlStr" + tempUrlStr);
+    //tempUrlStr = tempUrlStr.slice(0, -1)
+    console.log("checking tempURl  :: " + tempUrlStr);
     return tempUrlStr;
 }
 exports.getBuildAwaitUrlPath = getBuildAwaitUrlPath;
