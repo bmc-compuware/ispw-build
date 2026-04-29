@@ -132,6 +132,11 @@ function run() {
                     if (buildParms.taskIds && buildParms.taskIds.length > 0) {
                         console.log('Starting the build process for task ' + buildParms.taskIds.toString());
                     }
+                    else {
+                        console.log('Starting the build process assignment ' +
+                            buildParms.containerId + ' at level ' +
+                            buildParms.taskLevel);
+                    }
                     if (!isAuthTokenOrCerti(inputs_1.ces_token, inputs_1.certificate)) return [3 /*break*/, 2];
                     //for token
                     console.log('Using ces_token as authentication method.');

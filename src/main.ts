@@ -66,8 +66,12 @@ export async function run(): Promise<void> {
     )
     core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj))
 
-    if (buildParms.taskIds && buildParms.taskIds.length > 0){
-      console.log('Starting the build process for task ' + buildParms.taskIds.toString())
+    if (buildParms.taskIds && buildParms.taskIds.length > 0) {
+      console.log('Starting the build process for task ' + buildParms.taskIds.toString());
+    } else {
+        console.log('Starting the build process assignment ' +
+        buildParms.containerId + ' at level ' +
+        buildParms.taskLevel);
     }
 
     if (isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) {
@@ -92,14 +96,14 @@ export async function run(): Promise<void> {
                 'Code Pipeline: received error response body: ' +
                   utils.convertObjectToJson(error.response.data)
               )
-              setOutputs(error.response.data)
+              setOutputs(error.response.data);
               if (error.response.data) {
-                throw new GenerateFailureException(error.response.data.message)
+                throw new GenerateFailureException(error.response.data.message);
               } else {
-                throw new GenerateFailureException('There was a problem with the request to CES')
+                throw new GenerateFailureException('There was a problem with the request to CES');
               }
             }
-            throw error
+            throw error;
           }
         )
         .then((response: any) => {
