@@ -85,8 +85,7 @@ export async function run(): Promise<void> {
               'Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data)
             )
             // build could have passed or failed
-            setOutputs(response.data)
-            return handleResponseBody(response.data)
+            setOutputs(response.data)           
           },
           (error: any) => {
             // there was a problem with the request to CES
@@ -119,6 +118,7 @@ export async function run(): Promise<void> {
                   inputs.runtime_configuration, inputs.ces_url, core);
             }
           }
+          return handleResponseBody(response.data)
         },
         (error: any) => {
           core.debug(error.stack);

@@ -146,7 +146,6 @@ function run() {
                             core.debug('Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data));
                             // build could have passed or failed
                             setOutputs(response.data);
-                            return handleResponseBody(response.data);
                         }, function (error) {
                             // there was a problem with the request to CES
                             if (error.response !== undefined) {
@@ -173,6 +172,7 @@ function run() {
                                     utils.pollSetStatus(setUrl, setId, inputs_1.ces_token, 'Build', 2000, 60000, inputs_1.level, inputs_1.srid, inputs_1.runtime_configuration, inputs_1.ces_url, core);
                                 }
                             }
+                            return handleResponseBody(response.data);
                         }, function (error) {
                             core.debug(error.stack);
                             core.setFailed(error.message);
