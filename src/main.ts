@@ -152,7 +152,7 @@ export async function run(): Promise<void> {
           }
         )
         .then((response: any) => {
-          console.log('The Generate request submitted successfully.');
+          console.log('The Build request submitted successfully.');
           if (inputs.execution_status === 'I' || inputs.execution_status === '') {
             core.debug(
                 'Code Pipeline: Execution completed successfully.');

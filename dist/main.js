@@ -197,7 +197,7 @@ function run() {
                             throw error;
                         })
                             .then(function (response) {
-                            console.log('The Generate request submitted successfully.');
+                            console.log('The Build request submitted successfully.');
                             if (inputs_1.execution_status === 'I' || inputs_1.execution_status === '') {
                                 core.debug('Code Pipeline: Execution completed successfully.');
                                 var setUrl = response.url;
