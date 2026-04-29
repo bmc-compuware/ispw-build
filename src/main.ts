@@ -294,8 +294,7 @@ export function getBuildAwaitUrlPath(srid: string, buildParms: BuildParms) {
       tempUrlStr = tempUrlStr.concat(`taskId=${id}&`)
     })
   }
-  //tempUrlStr = tempUrlStr.slice(0, -1)
-  console.log("checking tempURl  :: " + tempUrlStr)
+  tempUrlStr = tempUrlStr.slice(0, -1)  
   return tempUrlStr
 }
 

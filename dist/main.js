@@ -338,8 +338,7 @@ function getBuildAwaitUrlPath(srid, buildParms) {
             tempUrlStr = tempUrlStr.concat("taskId=".concat(id, "&"));
         });
     }
-    //tempUrlStr = tempUrlStr.slice(0, -1)
-    console.log("checking tempURl  :: " + tempUrlStr);
+    tempUrlStr = tempUrlStr.slice(0, -1);
     return tempUrlStr;
 }
 exports.getBuildAwaitUrlPath = getBuildAwaitUrlPath;
