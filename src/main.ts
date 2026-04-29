@@ -85,7 +85,20 @@ export async function run(): Promise<void> {
               'Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data)
             )
             // build could have passed or failed
-            setOutputs(response.data)           
+            setOutputs(response.data)
+            console.log('The Build request submitted successfully.');
+            if (inputs.execution_status === 'I' || inputs.execution_status === '') {
+              core.debug(
+                'Code Pipeline: Execution completed successfully.');
+              const setUrl: URL   = response.url;
+              const setId: string = response.setId;
+              if (setId) {
+                utils.pollSetStatus(setUrl, setId, inputs.ces_token, 'Build',
+                  2000, 60000, inputs.level, inputs.srid,
+                  inputs.runtime_configuration, inputs.ces_url, core);
+              }
+            }     
+            return handleResponseBody(response.data)          
           },
           (error: any) => {
             // there was a problem with the request to CES
@@ -95,7 +108,7 @@ export async function run(): Promise<void> {
                 'Code Pipeline: received error response body: ' +
                   utils.convertObjectToJson(error.response.data)
               )
-              setOutputs(error.response.data);
+              setOutputs(error.response.data);              
               if (error.response.data) {
                 throw new GenerateFailureException(error.response.data.message);
               } else {
@@ -104,26 +117,11 @@ export async function run(): Promise<void> {
             }
             throw error;
           }
-        )
-        .then((response: any) => {
-          console.log('The Build request submitted successfully.');
-          if (inputs.execution_status === 'I' || inputs.execution_status === '') {
-            core.debug(
-                'Code Pipeline: Execution completed successfully.');
-            const setUrl: URL   = response.url;
-            const setId: string = response.setId;
-            if (setId) {
-              utils.pollSetStatus(setUrl, setId, inputs.ces_token, 'Build',
-                  2000, 60000, inputs.level, inputs.srid,
-                  inputs.runtime_configuration, inputs.ces_url, core);
-            }
-          }
-          return handleResponseBody(response.data)
-        },
-        (error: any) => {
+        )        
+        .then((error: any) => {
           core.debug(error.stack);
           core.setFailed(error.message);
-        });
+        })
     } else {
       //for certi
       console.log('Using certificate as authentication method.')
