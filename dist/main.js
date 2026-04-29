@@ -296,6 +296,7 @@ function setOutputs(responseBody) {
             core.setOutput('generate_success_count', responseBody.awaitStatus.generateSuccessCount);
             core.setOutput('has_failures', responseBody.awaitStatus.hasFailures);
             core.setOutput('task_count', responseBody.awaitStatus.taskCount);
+            core.setOutput('message', responseBody.awaitStatus.statusMsg);
         }
     }
 }

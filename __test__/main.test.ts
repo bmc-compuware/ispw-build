@@ -69,14 +69,17 @@ describe('main tests', () => {
     expect(output).toEqual({})
     expect(output.taskIds).toBeUndefined()
 
-    output = main.getParmsFromInputs('abc')
+    output = main.getParmsFromInputs('PLAY000123','','abc')
     expect(output).toBeDefined()
-    expect(output).toEqual({taskIds: ['abc']})
+    expect(output).toEqual({containerId: 'PLAY000123',taskIds: ['abc']})    
+    expect(output.containerId).toEqual('PLAY000123')
     expect(output.taskIds).toEqual(['abc'])
 
-    output = main.getParmsFromInputs('abc,123')
+    output = main.getParmsFromInputs('PLAY000456','DEV2','abc,123')
     expect(output).toBeDefined()
-    expect(output).toEqual({taskIds: ['abc', '123']})
+    expect(output).toEqual({containerId: 'PLAY000456', taskLevel: 'DEV2',taskIds: ['abc', '123']})
+    expect(output.containerId).toEqual('PLAY000456')
+    expect(output.taskLevel).toEqual('DEV2')
     expect(output.taskIds).toEqual(['abc', '123'])
   })
 
@@ -139,14 +142,30 @@ describe('main tests', () => {
   })
 
   it('getBuildAwaitUrlPath', () => {
-    expect(main.getBuildAwaitUrlPath('ISPW', {})).toEqual('/ispw/ISPW/build-await')
+    let buildParms: BuildParms = {
+      containerId: 'PLAY004799',
+      releaseId: ' ',
+      taskLevel: 'DEV2',
+      taskIds: ['7E53CC8FB3D6', '7E53CC8FB3D7']
+    }
+    expect(main.getBuildAwaitUrlPath('ISPW', {})).toEqual('/ispw/ISPW/build-await?assignmentId=undefined&level=undefined')
 
-    expect(main.getBuildAwaitUrlPath('ISPW', {taskIds: ['first']})).toEqual(
-      '/ispw/ISPW/build-await?taskId=first'
+    expect(main.getBuildAwaitUrlPath('ISPW', buildParms)).toEqual(
+      '/ispw/ISPW/build-await?assignmentId=PLAY004799&level=DEV2&taskId=7E53CC8FB3D6&taskId=7E53CC8FB3D7'
+    )
+
+    buildParms = {
+      containerId: 'PLAY004788',
+      releaseId: ' ',
+      taskLevel: 'DEV1',      
+    }
+
+    expect(main.getBuildAwaitUrlPath('ISPW', buildParms)).toEqual(
+      '/ispw/ISPW/build-await?assignmentId=PLAY004788&level=DEV1'
     )
 
     expect(main.getBuildAwaitUrlPath('ISPW', {taskIds: ['first', 'second']})).toEqual(
-      '/ispw/ISPW/build-await?taskId=first&taskId=second'
+      '/ispw/ISPW/build-await?assignmentId=undefined&level=undefined&taskId=first&taskId=second'
     )
   })
 })
