@@ -346,8 +346,8 @@ exports.assembleRequestBodyObject = assembleRequestBodyObject;
  */
 function getBuildAwaitUrlPath(srid, buildParms) {
     var tempUrlStr = "/ispw/".concat(srid, "/build-await?");
-    tempUrlStr = tempUrlStr.concat("level=".concat(buildParms.taskLevel));
-    tempUrlStr = tempUrlStr.concat("assignment_id=".concat(buildParms.containerId));
+    tempUrlStr = tempUrlStr.concat("assignmentId=".concat(buildParms.containerId, "&"));
+    tempUrlStr = tempUrlStr.concat("level=".concat(buildParms.taskLevel, "&"));
     if (buildParms.taskIds && buildParms.taskIds.length > 0) {
         buildParms.taskIds.forEach(function (id) {
             tempUrlStr = tempUrlStr.concat("taskId=".concat(id, "&"));

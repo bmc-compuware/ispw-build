@@ -303,8 +303,10 @@ export function assembleRequestBodyObject(
  */
 export function getBuildAwaitUrlPath(srid: string, buildParms: BuildParms) {
   let tempUrlStr = `/ispw/${srid}/build-await?`
-  tempUrlStr = tempUrlStr.concat(`level=${buildParms.taskLevel}`);
-  tempUrlStr = tempUrlStr.concat(`assignment_id=${buildParms.containerId}`);
+
+  tempUrlStr = tempUrlStr.concat(`assignmentId=${buildParms.containerId}&`);
+  tempUrlStr = tempUrlStr.concat(`level=${buildParms.taskLevel}&`);
+
   if (buildParms.taskIds  && buildParms.taskIds.length > 0) {
     buildParms.taskIds.forEach(id => {
       tempUrlStr = tempUrlStr.concat(`taskId=${id}&`)
