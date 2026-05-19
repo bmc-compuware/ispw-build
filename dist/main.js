@@ -87,7 +87,7 @@ var core = __importStar(require("@actions/core"));
 var utils = require('@bmc-compuware/ispw-action-utilities');
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var keys, inputs, buildParms, requiredFields, reqPath, reqUrl, hostAndPort, host, port, reqBodyObj, error_1;
+        var keys, inputs, buildParms, reqPath, reqUrl, hostAndPort, host, port, reqBodyObj, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -117,10 +117,6 @@ function run() {
                         buildParms = getParmsFromInputs(inputs.assignment_id, inputs.level, inputs.task_id);
                     }
                     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
-                    requiredFields = ['containerId', 'taskLevel'];
-                    if (!utils.validateBuildParms(buildParms, requiredFields)) {
-                        throw new MissingArgumentException('Inputs required for Code Pipeline Build are missing. ' + '\nSkipping the build request....');
-                    }
                     reqPath = getBuildAwaitUrlPath(inputs.srid, buildParms);
                     reqUrl = utils.assembleRequestUrl(inputs.ces_url, reqPath);
                     core.debug('Code Pipeline: request url: ' + reqUrl.href);
@@ -129,6 +125,14 @@ function run() {
                     port = hostAndPort[1];
                     reqBodyObj = assembleRequestBodyObject(inputs.runtime_configuration, inputs.change_type, inputs.execution_status);
                     core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj));
+                    if (!(utils.stringHasContent(buildParms.containerId) || utils.stringHasContent(buildParms.taskIds))) {
+                        throw new MissingArgumentException('Either taskIds or Assigment Id with Level requierd for Code Pipeline Build are missing. ' + '\nSkipping the build request....');
+                    }
+                    if (!utils.stringHasContent(buildParms.taskIds) && utils.stringHasContent(buildParms.containerId)) {
+                        if (!utils.stringHasContent(buildParms.taskLevel)) {
+                            throw new MissingArgumentException('Level value is required along with Assignment ID for Code Pipeline Build are missing. ' + '\nSkipping the build request....');
+                        }
+                    }
                     if (buildParms.taskIds && buildParms.taskIds.length > 0) {
                         console.log('Starting the build process for task ' + buildParms.taskIds.toString());
                     }
@@ -334,10 +338,15 @@ function getBuildAwaitUrlPath(srid, buildParms) {
     var tempUrlStr = "/ispw/".concat(srid, "/build-await?");
     tempUrlStr = tempUrlStr.concat("assignmentId=".concat(buildParms.containerId, "&"));
     tempUrlStr = tempUrlStr.concat("level=".concat(buildParms.taskLevel, "&"));
-    if (buildParms.taskIds && buildParms.taskIds.length > 0) {
-        buildParms.taskIds.forEach(function (id) {
-            tempUrlStr = tempUrlStr.concat("taskId=".concat(id, "&"));
-        });
+    if (!(utils.stringHasContent(buildParms.taskIds) && utils.stringHasContent(buildParms.containerId))) {
+        if (buildParms.taskIds && buildParms.taskIds.length > 0) {
+            buildParms.taskIds.forEach(function (id) {
+                tempUrlStr = tempUrlStr.concat("taskId=".concat(id, "&"));
+            });
+        }
+    }
+    else {
+        console.log('If both assignment Id and taskIds are provided , then task Ids will be ignored and build will be performed on assignment level.');
     }
     tempUrlStr = tempUrlStr.slice(0, -1);
     return tempUrlStr;
