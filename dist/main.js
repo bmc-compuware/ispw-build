@@ -126,7 +126,7 @@ function run() {
                     reqBodyObj = assembleRequestBodyObject(inputs.runtime_configuration, inputs.change_type, inputs.execution_status);
                     core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj));
                     //Validating either taskIds or Assignment Ids with Level should be provided.
-                    if (!(utils.stringHasContent(buildParms.containerId) || utils.stringHasContent(buildParms.taskIds))) {
+                    if (!utils.stringHasContent(buildParms.taskIds) || !utils.stringHasContent(buildParms.containerId)) {
                         throw new MissingArgumentException('Either taskIds or Assigment Id with Level requierd for Code Pipeline Build are missing. ' + '\nSkipping the build request....');
                     }
                     //Validating the Level value if Assignment ID value is specified.
