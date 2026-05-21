@@ -59,6 +59,8 @@ export async function run(): Promise<void> {
     )
     core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj)) 
 
+    
+    //processing the inputs if they are not retrieved from build_automatically
     if(!utils.stringHasContent(inputs.build_automatically)){
       //Validating either taskIds or Assignment Ids with Level should be provided.
       if(!utils.stringHasContent(buildParms.containerId) && !utils.stringHasContent(buildParms.taskIds)){
@@ -74,8 +76,12 @@ export async function run(): Promise<void> {
         }
       }
 
+      //If both assignment and taskIds are given, ignore taskIds
       if(utils.stringHasContent(buildParms.containerId) && utils.stringHasContent(buildParms.taskIds)){
-        console.log('If both assignment Id and taskIds are provided , then given task Ids will be ignored and build will be performed on all the tasks at given assignment level')
+        console.log('If both assignment Id and taskIds are provided, then given task Ids will be ignored and build will be performed on all the tasks at given assignment level')
+        console.log('Starting the build process assignment ' +
+          buildParms.containerId + ' at level ' +
+          buildParms.taskLevel);
       }
       else{
         if (utils.stringHasContent(buildParms.containerId)){
