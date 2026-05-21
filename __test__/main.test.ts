@@ -148,10 +148,11 @@ describe('main tests', () => {
       taskLevel: 'DEV2',
       taskIds: ['7E53CC8FB3D6', '7E53CC8FB3D7']
     }
-    expect(main.getBuildAwaitUrlPath('ISPW', {})).toEqual('/ispw/ISPW/build-await?assignmentId=undefined&level=undefined')
+    let build_automatically = true
+    expect(main.getBuildAwaitUrlPath('ISPW', {})).toEqual("/ispw/ISPW/build-await")
 
-    expect(main.getBuildAwaitUrlPath('ISPW', buildParms)).toEqual(
-      '/ispw/ISPW/build-await?assignmentId=PLAY004799&level=DEV2&taskId=7E53CC8FB3D6&taskId=7E53CC8FB3D7'
+    expect(main.getBuildAwaitUrlPath('ISPW', buildParms,build_automatically)).toEqual(
+      '/ispw/ISPW/build-await?taskId=7E53CC8FB3D6&taskId=7E53CC8FB3D7'
     )
 
     buildParms = {
@@ -160,12 +161,23 @@ describe('main tests', () => {
       taskLevel: 'DEV1',      
     }
 
+    build_automatically = false
     expect(main.getBuildAwaitUrlPath('ISPW', buildParms)).toEqual(
       '/ispw/ISPW/build-await?assignmentId=PLAY004788&level=DEV1'
     )
 
     expect(main.getBuildAwaitUrlPath('ISPW', {taskIds: ['first', 'second']})).toEqual(
-      '/ispw/ISPW/build-await?assignmentId=undefined&level=undefined&taskId=first&taskId=second'
+      '/ispw/ISPW/build-await?taskId=first&taskId=second'
     )
+
+    buildParms = {
+      containerId: 'PLAY004789',
+      releaseId: ' ',
+      taskLevel: 'DEV1',
+      taskIds: ['7E53CC8FB3D6', '7E53CC8FB3D7']       
+    }
+    expect(main.getBuildAwaitUrlPath('ISPW', buildParms)).toEqual(
+      '/ispw/ISPW/build-await?assignmentId=PLAY004789&level=DEV1'
+    )    
   })
 })
