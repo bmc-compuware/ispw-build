@@ -117,7 +117,7 @@ function run() {
                         buildParms = getParmsFromInputs(inputs.assignment_id, inputs.level, inputs.task_id);
                     }
                     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
-                    reqPath = getBuildAwaitUrlPath(inputs.srid, buildParms);
+                    reqPath = getBuildAwaitUrlPath(inputs.srid, buildParms, inputs.build_automatically);
                     reqUrl = utils.assembleRequestUrl(inputs.ces_url, reqPath);
                     core.debug('Code Pipeline: request url: ' + reqUrl.href);
                     hostAndPort = inputs.srid.split('-');
@@ -125,23 +125,32 @@ function run() {
                     port = hostAndPort[1];
                     reqBodyObj = assembleRequestBodyObject(inputs.runtime_configuration, inputs.change_type, inputs.execution_status);
                     core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj));
-                    //Validating either taskIds or Assignment Ids with Level should be provided.
-                    if (!utils.stringHasContent(buildParms.taskIds) || !utils.stringHasContent(buildParms.containerId)) {
-                        throw new MissingArgumentException('Either taskIds or Assigment Id with Level requierd for Code Pipeline Build are missing. ' + '\nSkipping the build request....');
-                    }
-                    //Validating the Level value if Assignment ID value is specified.
-                    if (!utils.stringHasContent(buildParms.taskIds) && utils.stringHasContent(buildParms.containerId)) {
-                        if (!utils.stringHasContent(buildParms.taskLevel)) {
-                            throw new MissingArgumentException('Level value is required along with Assignment ID for Code Pipeline Build are missing. ' + '\nSkipping the build request....');
+                    if (!utils.stringHasContent(inputs.build_automatically)) {
+                        //Validating either taskIds or Assignment Ids with Level should be provided.
+                        if (!utils.stringHasContent(buildParms.taskIds) || !utils.stringHasContent(buildParms.containerId)) {
+                            throw new MissingArgumentException('Either taskIds or Assigment Id with Level requierd for Code Pipeline Build are missing. ' + '\nSkipping the build request....');
+                        }
+                        //Validating the Level value if Assignment ID value is specified.
+                        if (!utils.stringHasContent(buildParms.taskIds) && utils.stringHasContent(buildParms.containerId)) {
+                            if (!utils.stringHasContent(buildParms.taskLevel)) {
+                                throw new MissingArgumentException('Level value is required along with Assignment ID for Code Pipeline Build are missing. ' + '\nSkipping the build request....');
+                            }
+                        }
+                        if (utils.stringHasContent(buildParms.containerId)) {
+                            console.log('Starting the build process assignment ' +
+                                buildParms.containerId + ' at level ' +
+                                buildParms.taskLevel);
+                        }
+                        else {
+                            if (buildParms.taskIds && buildParms.taskIds.length > 0) {
+                                console.log('Starting the build process for task ' + buildParms.taskIds.toString());
+                            }
                         }
                     }
-                    if (buildParms.taskIds && buildParms.taskIds.length > 0) {
-                        console.log('Starting the build process for task ' + buildParms.taskIds.toString());
-                    }
                     else {
-                        console.log('Starting the build process assignment ' +
-                            buildParms.containerId + ' at level ' +
-                            buildParms.taskLevel);
+                        if (buildParms.taskIds && buildParms.taskIds.length > 0) {
+                            console.log('Starting the build process for task ' + buildParms.taskIds.toString());
+                        }
                     }
                     if (!isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) return [3 /*break*/, 2];
                     //for token
@@ -336,11 +345,9 @@ exports.assembleRequestBodyObject = assembleRequestBodyObject;
  * @param buildParms The build parms to use when filling out the request url
  * @return the request path which can be appended to the CES url
  */
-function getBuildAwaitUrlPath(srid, buildParms) {
+function getBuildAwaitUrlPath(srid, buildParms, build_automatically) {
     var tempUrlStr = "/ispw/".concat(srid, "/build-await?");
-    tempUrlStr = tempUrlStr.concat("assignmentId=".concat(buildParms.containerId, "&"));
-    tempUrlStr = tempUrlStr.concat("level=".concat(buildParms.taskLevel, "&"));
-    if (!(utils.stringHasContent(buildParms.taskIds) && utils.stringHasContent(buildParms.containerId))) {
+    if (utils.stringHasContent(build_automatically)) {
         if (buildParms.taskIds && buildParms.taskIds.length > 0) {
             buildParms.taskIds.forEach(function (id) {
                 tempUrlStr = tempUrlStr.concat("taskId=".concat(id, "&"));
@@ -348,7 +355,18 @@ function getBuildAwaitUrlPath(srid, buildParms) {
         }
     }
     else {
-        console.log('If both assignment Id and taskIds are provided , then task Ids will be ignored and build will be performed on assignment level.');
+        tempUrlStr = tempUrlStr.concat("assignmentId=".concat(buildParms.containerId, "&"));
+        tempUrlStr = tempUrlStr.concat("level=".concat(buildParms.taskLevel, "&"));
+        if (!(utils.stringHasContent(buildParms.taskIds) && utils.stringHasContent(buildParms.containerId))) {
+            if (buildParms.taskIds && buildParms.taskIds.length > 0) {
+                buildParms.taskIds.forEach(function (id) {
+                    tempUrlStr = tempUrlStr.concat("taskId=".concat(id, "&"));
+                });
+            }
+        }
+        else {
+            console.log('If both assignment Id and taskIds are provided , then task Ids will be ignored and build will be performed on given assignment level.');
+        }
     }
     tempUrlStr = tempUrlStr.slice(0, -1);
     return tempUrlStr;
