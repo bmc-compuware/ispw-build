@@ -315,20 +315,20 @@ export function getBuildAwaitUrlPath(srid: string, buildParms: BuildParms,build_
       })
     }
   }
-  else{
-    tempUrlStr = tempUrlStr.concat(`assignmentId=${buildParms.containerId}&`);
-    tempUrlStr = tempUrlStr.concat(`level=${buildParms.taskLevel}&`);
-    if(!(utils.stringHasContent(buildParms.taskIds) && utils.stringHasContent(buildParms.containerId))){
+  else { 
+    if(utils.stringHasContent(buildParms.containerId) || 
+    (utils.stringHasContent(buildParms.containerId) && utils.stringHasContent(buildParms.taskIds))){
+      tempUrlStr = tempUrlStr.concat(`assignmentId=${buildParms.containerId}&`);
+      tempUrlStr = tempUrlStr.concat(`level=${buildParms.taskLevel}&`);
+    }
+    else{
       if (buildParms.taskIds  && buildParms.taskIds.length > 0) {
         buildParms.taskIds.forEach(id => {
           tempUrlStr = tempUrlStr.concat(`taskId=${id}&`)
         })
       }
-    }
-    else{
-      console.log('If both assignment Id and taskIds are provided , then given task Ids will be ignored and build will be performed on all the tasks at given assignment level.')
-    }  
-  }
+    }    
+  } 
   tempUrlStr = tempUrlStr.slice(0, -1)  
   return tempUrlStr
 }
