@@ -42,7 +42,7 @@ jobs:
         run: echo "The number of generate failures is ${{ steps.build.outputs.generate_failed_count }}"
 ```
 
-The following example will generate two specific Code Pipeline tasks using ces_token as authentication method
+The following example will build two specific Code Pipeline tasks using ces_token as authentication method
 
 ``` yaml
 on: [push]
@@ -65,7 +65,7 @@ jobs:
         run: echo "The Code Pipeline set used for the build is ${{ steps.build.outputs.set_id }}"
 ```
 
-The following example will generate two specific Code Pipeline tasks using certificate as authentication method
+The following example will build two specific Code Pipeline tasks using certificate as authentication method
 
 ``` yaml
 on: [push]
@@ -83,7 +83,32 @@ jobs:
           certificate: ${{ secrets.certificate }}
           srid: host-37733
           runtime_configuration: ISPW
-          task_id: "7E3A5B274D24,7E3A5B274EFA"
+          assignment_id: PLAY000826
+          level: DEV2          
+      - name: Get the set ID for the build
+        run: echo "The Code Pipeline set used for the build is ${{ steps.build.outputs.set_id }}"
+```
+
+The following example will build tasks at DEV1 level in assignment container PLAY000826.
+
+``` yaml
+on: [push]
+
+jobs:
+  run-code-pipeline-build:
+    runs-on: ubuntu-latest
+    name: A job to build in Code Pipeline
+    steps:
+      - name: Build
+        uses: bmc-compuware/ispw-build@v1
+        id: build
+        with:
+          ces_url: "https://CES:48226/"
+          ces_token: ${{ secrets.CES_TOKEN }}
+          srid: host-37733
+          runtime_configuration: ISPW
+          assignment_id: PLAY000826
+          level: DEV1
       - name: Get the set ID for the build
         run: echo "The Code Pipeline set used for the build is ${{ steps.build.outputs.set_id }}"
 ```
@@ -97,7 +122,9 @@ jobs:
 | `change_type` | Optional | The change type of this request. The default value is 'S' for standard. |
 | `execution_status` | Optional | The flag to indicate whether the build should happen immediately, or should be held. The default is 'I' for immediate. Other possible value is 'H' for hold. |
 | `runtime_configuration` | Optional | The runtime configuration for the instance of Code Pipeline you are connecting to. |
-| `build_automatically` | Optional | A string of JSON that contains the parameters for the build. If using a Code Pipeline Sync or Code Pipeline Sync Local step before the build, this JSON string can be retrieved from the outputs of that step. If `build_automatically` is not being used, then the task_id must be specified. |
+| `build_automatically` | Optional | A string of JSON that contains the parameters for the build. If using a Code Pipeline Sync or Code Pipeline Sync Local step before the build, this JSON string can be retrieved from the outputs of that step. If `build_automatically` is not being used, then the `assignment_id` and `level` must be specified. |
+| `assignment_id` | Optional | The assignment for which you intend to build tasks. Do not use if `build_automatically` has already been specified.  
+| `level` | Optional | The level that the tasks exist at in the assignment. Do not use if `build_automatically` has already been specified. | `level` is required ,if `assignment_id` is specified.
 | `task_id` | Optional | The comma-separated string of task IDs for the tasks that need to be built. Do not use if `build_automatically` has already been specified.|
 
 | `ces_token` | Optional | The token to use when authenticating the request to CES |
@@ -106,6 +133,8 @@ jobs:
 ## NOTE
 
 Users must pass one of the authentication method in workflow i.e ces_token or certificate.
+
+If `build_automatically` is not specified , then either `task_id` or `assignment_id` with `level` are mandatory. If both `assignment_id` and `task_id` values are specified, then build will be performed at given  `assignment_id` and `level` only
 
 
 ## Outputs
@@ -121,6 +150,7 @@ Users must pass one of the authentication method in workflow i.e ces_token or ce
 | `url` | string | The URL that can be used to retrieved information about the set that was used for processing. |
 | `assignment_id` | string | The assignment ID that can be used to retrieved information about the assignment that was used for processing. |
 | `output_json` | JSON | the JSON output from build |
+| `message` | string | The reason of failure of build action. |
 
 ## Setup
 

@@ -19,6 +19,12 @@ inputs:
   runtime_configuration:
     description: 'The runtime configuration used when connecting to Code Pipeline'
     required: false
+  assignment_id:
+    description: 'The container for which you intend to build tasks.'
+    required: false
+  level:
+    description: 'The level that the tasks exist at in the assignment'
+    required: false
   task_id:
     description: 'The comma-separated list of task IDs for the tasks that need to be built'
     required: false

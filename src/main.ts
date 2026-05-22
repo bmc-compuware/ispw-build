@@ -3,7 +3,7 @@
  * SOFTWARE, INC. ALL OTHER COMPANY PRODUCT NAMES ARE TRADEMARKS OF THEIR
  * RESPECTIVE OWNERS.
  *
- * (c) Copyright 2021 BMC Software, Inc.
+ * (c) Copyright 2021-2026 BMC Software, Inc.
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 import * as core from '@actions/core'
@@ -23,6 +23,8 @@ export async function run(): Promise<void> {
       'ces_token',
       'certificate',
       'srid',
+      'assignment_id',
+      'level',
       'runtime_configuration',
       'change_type',
       'execution_status'
@@ -37,18 +39,15 @@ export async function run(): Promise<void> {
       buildParms = utils.parseStringAsJson(inputs.build_automatically) as BuildParms
     } else {
       console.log('Build parameters are being retrieved from the inputs.')
-      buildParms = getParmsFromInputs(inputs.task_id)
+      buildParms = getParmsFromInputs(inputs.assignment_id, inputs.level, inputs.task_id)
     }
     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms))
 
-    const requiredFields = ['taskIds']
-    if (!utils.validateBuildParms(buildParms, requiredFields)) {
-      throw new MissingArgumentException(
-        'Inputs required for Code Pipeline Build are missing. ' + '\nSkipping the build request....'
-      )
-    }
-
-    const reqPath: string = getBuildAwaitUrlPath(inputs.srid, buildParms)
+    const reqPath: string = getBuildAwaitUrlPath(
+      inputs.srid,
+      buildParms,
+      inputs.build_automatically
+    )
     const reqUrl: URL = utils.assembleRequestUrl(inputs.ces_url, reqPath)
     core.debug('Code Pipeline: request url: ' + reqUrl.href)
 
@@ -64,8 +63,57 @@ export async function run(): Promise<void> {
     )
     core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj))
 
-    if (buildParms.taskIds) {
-      console.log('Starting the build process for task ' + buildParms.taskIds.toString())
+    //processing the inputs if they are not retrieved from build_automatically
+    if (!utils.stringHasContent(inputs.build_automatically)) {
+      //Validating either taskIds or Assignment Ids with Level should be provided.
+      if (
+        !utils.stringHasContent(buildParms.containerId) &&
+        !utils.stringHasContent(buildParms.taskIds)
+      ) {
+        throw new Error(
+          'Either Task IDs or Assignment ID with Level required for Code Pipeline Build. '
+        )
+      }
+
+      //Validating the Level value if Assignment ID value is specified.
+      if (utils.stringHasContent(buildParms.containerId)) {
+        if (!utils.stringHasContent(buildParms.taskLevel)) {
+          throw new Error('Assignment ID and Level are mandatory for the Code Pipeline build')
+        }
+      }
+
+      //If both assignment and taskIds are given, ignore taskIds
+      if (
+        utils.stringHasContent(buildParms.containerId) &&
+        utils.stringHasContent(buildParms.taskIds)
+      ) {
+        console.log(
+          'If both Assignment ID and Task IDs are provided, the specified Task IDs will be ignored, and the build will be executed for all tasks associated with the given Assignment ID'
+        )
+        console.log(
+          'Starting the build process assignment ' +
+            buildParms.containerId +
+            ' at level ' +
+            buildParms.taskLevel
+        )
+      } else {
+        if (utils.stringHasContent(buildParms.containerId)) {
+          console.log(
+            'Starting the build process assignment ' +
+              buildParms.containerId +
+              ' at level ' +
+              buildParms.taskLevel
+          )
+        } else {
+          if (buildParms.taskIds && buildParms.taskIds.length > 0) {
+            console.log('Starting the build process for task ' + buildParms.taskIds.toString())
+          }
+        }
+      }
+    } else {
+      if (buildParms.taskIds && buildParms.taskIds.length > 0) {
+        console.log('Starting the build process for task ' + buildParms.taskIds.toString())
+      }
     }
 
     if (isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) {
@@ -168,8 +216,20 @@ export async function run(): Promise<void> {
  * @return {BuildParms} a BuildParms object with the fields filled in.
  * This will never return undefined.
  */
-export function getParmsFromInputs(inputTaskId: string | undefined): BuildParms {
+export function getParmsFromInputs(
+  inputAssignment: string | undefined,
+  inputLevel: string | undefined,
+  inputTaskId: string | undefined
+): BuildParms {
   const buildParms: BuildParms = {}
+
+  if (utils.stringHasContent(inputAssignment)) {
+    buildParms.containerId = inputAssignment
+  }
+
+  if (utils.stringHasContent(inputLevel)) {
+    buildParms.taskLevel = inputLevel
+  }
   if (inputTaskId && utils.stringHasContent(inputTaskId)) {
     buildParms.taskIds = inputTaskId.split(',')
   }
@@ -189,6 +249,12 @@ export function handleResponseBody(responseBody: any): any {
   if (responseBody === undefined) {
     // empty response
     throw new GenerateFailureException('No response was received from the build request.')
+  } else if (
+    responseBody.message ==
+    'Impacted tasks not found. No impacts have been detected by build processing.'
+  ) {
+    console.log(utils.getStatusMessageToPrint(responseBody.message))
+    return responseBody
   } else if (responseBody.awaitStatus === undefined) {
     // Build did not complete - there should be a message returned
     if (responseBody.message !== undefined) {
@@ -227,6 +293,7 @@ function setOutputs(responseBody: any) {
       core.setOutput('generate_success_count', responseBody.awaitStatus.generateSuccessCount)
       core.setOutput('has_failures', responseBody.awaitStatus.hasFailures)
       core.setOutput('task_count', responseBody.awaitStatus.taskCount)
+      core.setOutput('message', responseBody.awaitStatus.statusMsg)
     }
   }
 }
@@ -267,12 +334,32 @@ export function assembleRequestBodyObject(
  * @param buildParms The build parms to use when filling out the request url
  * @return the request path which can be appended to the CES url
  */
-export function getBuildAwaitUrlPath(srid: string, buildParms: BuildParms) {
+export function getBuildAwaitUrlPath(
+  srid: string,
+  buildParms: BuildParms,
+  build_automatically: string | undefined
+) {
   let tempUrlStr = `/ispw/${srid}/build-await?`
-  if (buildParms.taskIds) {
-    buildParms.taskIds.forEach(id => {
-      tempUrlStr = tempUrlStr.concat(`taskId=${id}&`)
-    })
+  if (utils.stringHasContent(build_automatically)) {
+    if (buildParms.taskIds && buildParms.taskIds.length > 0) {
+      buildParms.taskIds.forEach(id => {
+        tempUrlStr = tempUrlStr.concat(`taskId=${id}&`)
+      })
+    }
+  } else {
+    if (
+      utils.stringHasContent(buildParms.containerId) ||
+      (utils.stringHasContent(buildParms.containerId) && utils.stringHasContent(buildParms.taskIds))
+    ) {
+      tempUrlStr = tempUrlStr.concat(`assignmentId=${buildParms.containerId}&`)
+      tempUrlStr = tempUrlStr.concat(`level=${buildParms.taskLevel}&`)
+    } else {
+      if (buildParms.taskIds && buildParms.taskIds.length > 0) {
+        buildParms.taskIds.forEach(id => {
+          tempUrlStr = tempUrlStr.concat(`taskId=${id}&`)
+        })
+      }
+    }
   }
   tempUrlStr = tempUrlStr.slice(0, -1)
   return tempUrlStr

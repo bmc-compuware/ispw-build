@@ -9,5 +9,5 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 var main_1 = require("./main");
-main_1.run();
+(0, main_1.run)();
 //# sourceMappingURL=ispw-build.js.map
