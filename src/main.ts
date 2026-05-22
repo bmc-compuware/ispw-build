@@ -78,9 +78,7 @@ export async function run(): Promise<void> {
       //Validating the Level value if Assignment ID value is specified.
       if (utils.stringHasContent(buildParms.containerId)) {
         if (!utils.stringHasContent(buildParms.taskLevel)) {
-          throw new Error(
-            'Level value is required along with Assignment ID for Code Pipeline Build '
-          )
+          throw new Error('Assignment ID and Level are mandatory for the Code Pipeline build')
         }
       }
 
