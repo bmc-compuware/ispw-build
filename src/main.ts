@@ -27,7 +27,7 @@ export async function run(): Promise<void> {
       'level',
       'runtime_configuration',
       'change_type',
-      'execution_status'      
+      'execution_status'
     ]
 
     const inputs = utils.retrieveInputs(core, keys) as Inputs
@@ -42,8 +42,12 @@ export async function run(): Promise<void> {
       buildParms = getParmsFromInputs(inputs.assignment_id, inputs.level, inputs.task_id)
     }
     core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms))
-  
-    const reqPath: string = getBuildAwaitUrlPath(inputs.srid, buildParms, inputs.build_automatically)
+
+    const reqPath: string = getBuildAwaitUrlPath(
+      inputs.srid,
+      buildParms,
+      inputs.build_automatically
+    )
     const reqUrl: URL = utils.assembleRequestUrl(inputs.ces_url, reqPath)
     core.debug('Code Pipeline: request url: ' + reqUrl.href)
 
@@ -57,49 +61,63 @@ export async function run(): Promise<void> {
       inputs.change_type,
       inputs.execution_status
     )
-    core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj)) 
+    core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj))
 
-    
     //processing the inputs if they are not retrieved from build_automatically
-    if(!utils.stringHasContent(inputs.build_automatically)){
+    if (!utils.stringHasContent(inputs.build_automatically)) {
       //Validating either taskIds or Assignment Ids with Level should be provided.
-      if(!utils.stringHasContent(buildParms.containerId) && !utils.stringHasContent(buildParms.taskIds)){
-        throw new MissingArgumentException('Either taskIds or Assigment Id with Level requierd for Code Pipeline Build are missing. ' + '\nSkipping the build request....')
+      if (
+        !utils.stringHasContent(buildParms.containerId) &&
+        !utils.stringHasContent(buildParms.taskIds)
+      ) {
+        throw new MissingArgumentException(
+          'Either taskIds or Assigment Id with Level requierd for Code Pipeline Build are missing. ' +
+            '\nSkipping the build request....'
+        )
       }
-   
+
       //Validating the Level value if Assignment ID value is specified.
-      if(utils.stringHasContent(buildParms.containerId)){
-        if(!utils.stringHasContent(buildParms.taskLevel)){
+      if (utils.stringHasContent(buildParms.containerId)) {
+        if (!utils.stringHasContent(buildParms.taskLevel)) {
           throw new MissingArgumentException(
-          'Level value is required along with Assignment ID for Code Pipeline Build are missing. ' + '\nSkipping the build request....'
-        )   
+            'Level value is required along with Assignment ID for Code Pipeline Build are missing. ' +
+              '\nSkipping the build request....'
+          )
         }
       }
 
       //If both assignment and taskIds are given, ignore taskIds
-      if(utils.stringHasContent(buildParms.containerId) && utils.stringHasContent(buildParms.taskIds)){
-        console.log('If both assignment Id and taskIds are provided, then given task Ids will be ignored and build will be performed on all the tasks at given assignment level')
-        console.log('Starting the build process assignment ' +
-          buildParms.containerId + ' at level ' +
-          buildParms.taskLevel);
-      }
-      else{
-        if (utils.stringHasContent(buildParms.containerId)){
-          console.log('Starting the build process assignment ' +
-          buildParms.containerId + ' at level ' +
-          buildParms.taskLevel);
-        }
-        else{
+      if (
+        utils.stringHasContent(buildParms.containerId) &&
+        utils.stringHasContent(buildParms.taskIds)
+      ) {
+        console.log(
+          'If both assignment Id and taskIds are provided, then given task Ids will be ignored and build will be performed on all the tasks at given assignment level'
+        )
+        console.log(
+          'Starting the build process assignment ' +
+            buildParms.containerId +
+            ' at level ' +
+            buildParms.taskLevel
+        )
+      } else {
+        if (utils.stringHasContent(buildParms.containerId)) {
+          console.log(
+            'Starting the build process assignment ' +
+              buildParms.containerId +
+              ' at level ' +
+              buildParms.taskLevel
+          )
+        } else {
           if (buildParms.taskIds && buildParms.taskIds.length > 0) {
-            console.log('Starting the build process for task ' + buildParms.taskIds.toString());
-          }   
-        } 
-      }    
-    }
-    else{
+            console.log('Starting the build process for task ' + buildParms.taskIds.toString())
+          }
+        }
+      }
+    } else {
       if (buildParms.taskIds && buildParms.taskIds.length > 0) {
-        console.log('Starting the build process for task ' + buildParms.taskIds.toString());
-      } 
+        console.log('Starting the build process for task ' + buildParms.taskIds.toString())
+      }
     }
 
     if (isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) {
@@ -202,17 +220,19 @@ export async function run(): Promise<void> {
  * @return {BuildParms} a BuildParms object with the fields filled in.
  * This will never return undefined.
  */
-export function getParmsFromInputs(inputAssignment: string | undefined,
+export function getParmsFromInputs(
+  inputAssignment: string | undefined,
   inputLevel: string | undefined,
-  inputTaskId: string | undefined): BuildParms {
+  inputTaskId: string | undefined
+): BuildParms {
   const buildParms: BuildParms = {}
 
   if (utils.stringHasContent(inputAssignment)) {
-    buildParms.containerId = inputAssignment;
+    buildParms.containerId = inputAssignment
   }
 
   if (utils.stringHasContent(inputLevel)) {
-    buildParms.taskLevel = inputLevel;
+    buildParms.taskLevel = inputLevel
   }
   if (inputTaskId && utils.stringHasContent(inputTaskId)) {
     buildParms.taskIds = inputTaskId.split(',')
@@ -233,6 +253,12 @@ export function handleResponseBody(responseBody: any): any {
   if (responseBody === undefined) {
     // empty response
     throw new GenerateFailureException('No response was received from the build request.')
+  } else if (
+    responseBody.message ==
+    'Impacted tasks not found. No impacts have been detected by build processing.'
+  ) {
+    console.log(utils.getStatusMessageToPrint(responseBody.message))
+    return responseBody
   } else if (responseBody.awaitStatus === undefined) {
     // Build did not complete - there should be a message returned
     if (responseBody.message !== undefined) {
@@ -312,30 +338,34 @@ export function assembleRequestBodyObject(
  * @param buildParms The build parms to use when filling out the request url
  * @return the request path which can be appended to the CES url
  */
-export function getBuildAwaitUrlPath(srid: string, buildParms: BuildParms,build_automatically: string | undefined) {
-  let tempUrlStr = `/ispw/${srid}/build-await?`    
+export function getBuildAwaitUrlPath(
+  srid: string,
+  buildParms: BuildParms,
+  build_automatically: string | undefined
+) {
+  let tempUrlStr = `/ispw/${srid}/build-await?`
   if (utils.stringHasContent(build_automatically)) {
-    if (buildParms.taskIds  && buildParms.taskIds.length > 0) {
+    if (buildParms.taskIds && buildParms.taskIds.length > 0) {
       buildParms.taskIds.forEach(id => {
         tempUrlStr = tempUrlStr.concat(`taskId=${id}&`)
       })
     }
-  }
-  else { 
-    if(utils.stringHasContent(buildParms.containerId) || 
-    (utils.stringHasContent(buildParms.containerId) && utils.stringHasContent(buildParms.taskIds))){
-      tempUrlStr = tempUrlStr.concat(`assignmentId=${buildParms.containerId}&`);
-      tempUrlStr = tempUrlStr.concat(`level=${buildParms.taskLevel}&`);
-    }
-    else{
-      if (buildParms.taskIds  && buildParms.taskIds.length > 0) {
+  } else {
+    if (
+      utils.stringHasContent(buildParms.containerId) ||
+      (utils.stringHasContent(buildParms.containerId) && utils.stringHasContent(buildParms.taskIds))
+    ) {
+      tempUrlStr = tempUrlStr.concat(`assignmentId=${buildParms.containerId}&`)
+      tempUrlStr = tempUrlStr.concat(`level=${buildParms.taskLevel}&`)
+    } else {
+      if (buildParms.taskIds && buildParms.taskIds.length > 0) {
         buildParms.taskIds.forEach(id => {
           tempUrlStr = tempUrlStr.concat(`taskId=${id}&`)
         })
       }
-    }    
-  } 
-  tempUrlStr = tempUrlStr.slice(0, -1)  
+    }
+  }
+  tempUrlStr = tempUrlStr.slice(0, -1)
   return tempUrlStr
 }
 

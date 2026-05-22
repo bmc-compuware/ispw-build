@@ -84,8 +84,7 @@ jobs:
           srid: host-37733
           runtime_configuration: ISPW
           assignment_id: PLAY000826
-          level: DEV2
-          task_id: "7E3A5B274D24,7E3A5B274EFA"
+          level: DEV2          
       - name: Get the set ID for the build
         run: echo "The Code Pipeline set used for the build is ${{ steps.build.outputs.set_id }}"
 ```
@@ -124,8 +123,8 @@ jobs:
 | `execution_status` | Optional | The flag to indicate whether the build should happen immediately, or should be held. The default is 'I' for immediate. Other possible value is 'H' for hold. |
 | `runtime_configuration` | Optional | The runtime configuration for the instance of Code Pipeline you are connecting to. |
 | `build_automatically` | Optional | A string of JSON that contains the parameters for the build. If using a Code Pipeline Sync or Code Pipeline Sync Local step before the build, this JSON string can be retrieved from the outputs of that step. If `build_automatically` is not being used, then the `assignment_id` and `level` must be specified. |
-| `assignment_id` | Optional | The assignment for which you intend to build tasks. Do not use if `build_automatically` has already been specified. |
-| `level` | Optional | The level that the tasks exist at in the assignment. Do not use if `build_automatically` has already been specified. |
+| `assignment_id` | Optional | The assignment for which you intend to build tasks. Do not use if `build_automatically` has already been specified.  
+| `level` | Optional | The level that the tasks exist at in the assignment. Do not use if `build_automatically` has already been specified. | `level` is required ,if `assignment_id` is specified.
 | `task_id` | Optional | The comma-separated string of task IDs for the tasks that need to be built. Do not use if `build_automatically` has already been specified.|
 
 | `ces_token` | Optional | The token to use when authenticating the request to CES |
@@ -134,6 +133,8 @@ jobs:
 ## NOTE
 
 Users must pass one of the authentication method in workflow i.e ces_token or certificate.
+
+If `build_automatically` is not specified , then either `task_id` or `assignment_id` with `level` are mandatory. If both `assignment_id` and `task_id` values are specified, then build will be performed at given  `assignment_id` and `level` only
 
 
 ## Outputs
