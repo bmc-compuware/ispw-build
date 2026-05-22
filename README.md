@@ -42,7 +42,7 @@ jobs:
         run: echo "The number of generate failures is ${{ steps.build.outputs.generate_failed_count }}"
 ```
 
-The following example will generate two specific Code Pipeline tasks using ces_token as authentication method
+The following example will build two specific Code Pipeline tasks using ces_token as authentication method
 
 ``` yaml
 on: [push]
@@ -65,7 +65,7 @@ jobs:
         run: echo "The Code Pipeline set used for the build is ${{ steps.build.outputs.set_id }}"
 ```
 
-The following example will generate two specific Code Pipeline tasks using certificate as authentication method
+The following example will build two specific Code Pipeline tasks using certificate as authentication method
 
 ``` yaml
 on: [push]
@@ -89,7 +89,7 @@ jobs:
         run: echo "The Code Pipeline set used for the build is ${{ steps.build.outputs.set_id }}"
 ```
 
-The following example will generate tasks at DEV1 level in assignment container PLAY000826.
+The following example will build tasks at DEV1 level in assignment container PLAY000826.
 
 ``` yaml
 on: [push]

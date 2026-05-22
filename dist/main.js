@@ -80,7 +80,7 @@ exports.GenerateFailureException = exports.MissingArgumentException = exports.is
  * SOFTWARE, INC. ALL OTHER COMPANY PRODUCT NAMES ARE TRADEMARKS OF THEIR
  * RESPECTIVE OWNERS.
  *
- * (c) Copyright 2021 BMC Software, Inc.
+ * (c) Copyright 2021-2026 BMC Software, Inc.
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 var core = __importStar(require("@actions/core"));
@@ -130,7 +130,7 @@ function run() {
                         //Validating either taskIds or Assignment Ids with Level should be provided.
                         if (!utils.stringHasContent(buildParms.containerId) &&
                             !utils.stringHasContent(buildParms.taskIds)) {
-                            throw new Error('Either taskIds or Assigment Id with Level requierd for Code Pipeline Build. ');
+                            throw new Error('Either Task IDs or Assignment ID with Level required for Code Pipeline Build. ');
                         }
                         //Validating the Level value if Assignment ID value is specified.
                         if (utils.stringHasContent(buildParms.containerId)) {
@@ -141,7 +141,7 @@ function run() {
                         //If both assignment and taskIds are given, ignore taskIds
                         if (utils.stringHasContent(buildParms.containerId) &&
                             utils.stringHasContent(buildParms.taskIds)) {
-                            console.log('If both assignment Id and taskIds are provided, then given task Ids will be ignored and build will be performed on all the tasks at given assignment level');
+                            console.log('If both Assignment ID and Task IDs are provided, the specified Task IDs will be ignored, and the build will be executed for all tasks associated with the given Assignment ID');
                             console.log('Starting the build process assignment ' +
                                 buildParms.containerId +
                                 ' at level ' +
