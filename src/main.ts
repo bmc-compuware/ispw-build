@@ -70,18 +70,16 @@ export async function run(): Promise<void> {
         !utils.stringHasContent(buildParms.containerId) &&
         !utils.stringHasContent(buildParms.taskIds)
       ) {
-        throw new MissingArgumentException(
-          'Either taskIds or Assigment Id with Level requierd for Code Pipeline Build are missing. ' +
-            '\nSkipping the build request....'
+        throw new Error(
+          'Either taskIds or Assigment Id with Level requierd for Code Pipeline Build. '
         )
       }
 
       //Validating the Level value if Assignment ID value is specified.
       if (utils.stringHasContent(buildParms.containerId)) {
         if (!utils.stringHasContent(buildParms.taskLevel)) {
-          throw new MissingArgumentException(
-            'Level value is required along with Assignment ID for Code Pipeline Build are missing. ' +
-              '\nSkipping the build request....'
+          throw new Error(
+            'Level value is required along with Assignment ID for Code Pipeline Build '
           )
         }
       }

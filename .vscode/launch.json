@@ -8,12 +8,12 @@
         "skipFiles": ["<node_internals>/**"],
         "program": "${workspaceFolder}/src/ispw-build.ts",
         "env": {
-          "INPUT_CES_URL": "http://nwa-iztdm-dv11:48226/",
-          "INPUT_CES_TOKEN": "e21fa565-7be8-486f-a234-427845a18975",
+          "INPUT_CES_URL": "http://172.28.215.58:48080",
+          "INPUT_CES_TOKEN": "6ea1e021-4b33-47e3-b3b6-3c2e6d2cae4b",
           "INPUT_SRID": "cw09",
           "INPUT_RUNTIME_CONFIGURATION": "TPTP",
           "INPUT_ASSIGNMENT_ID": "ISP3005605",
-          "INPUT_LEVEL": "DEV1",
+         // "INPUT_LEVEL": "DEV1",
           //"INPUT_TASK_ID":"7EA5AA877E33"          
         }
       },
