@@ -8,6 +8,10 @@
 import {CesRequestBody} from '../src/types/CesRequestBody'
 import {BuildParms} from '../src/types/BuildParms'
 import {Inputs} from '../src/types/Inputs'
+
+// Mock the problematic module to avoid ES module issues
+jest.mock('@bmc-compuware/ispw-action-utilities')
+
 const main = require('../src/main')
 
 describe('entity tests', () => {
