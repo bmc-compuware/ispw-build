@@ -1,19 +1,4 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -46,33 +31,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GenerateFailureException = exports.MissingArgumentException = exports.isAuthTokenOrCerti = exports.getBuildAwaitUrlPath = exports.assembleRequestBodyObject = exports.handleResponseBody = exports.getParmsFromInputs = exports.run = void 0;
 /**
@@ -83,172 +41,161 @@ exports.GenerateFailureException = exports.MissingArgumentException = exports.is
  * (c) Copyright 2021-2026 BMC Software, Inc.
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
-var core = __importStar(require("@actions/core"));
-var utils = require('@bmc-compuware/ispw-action-utilities');
+const core = __importStar(require("@actions/core"));
+const utils = require('@bmc-compuware/ispw-action-utilities');
 function run() {
-    return __awaiter(this, void 0, void 0, function () {
-        var keys, inputs, buildParms, reqPath, reqUrl, hostAndPort, host, port, reqBodyObj, error_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 5, , 6]);
-                    keys = [
-                        'build_automatically',
-                        'task_id',
-                        'ces_url',
-                        'ces_token',
-                        'certificate',
-                        'srid',
-                        'assignment_id',
-                        'level',
-                        'runtime_configuration',
-                        'change_type',
-                        'execution_status'
-                    ];
-                    inputs = utils.retrieveInputs(core, keys);
-                    core.debug('Code Pipeline: parsed inputs: ' + utils.convertObjectToJson(inputs));
-                    buildParms = void 0;
-                    if (utils.stringHasContent(inputs.build_automatically)) {
-                        console.log('Build parameters are being retrieved from the build_automatically input.');
-                        buildParms = utils.parseStringAsJson(inputs.build_automatically);
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const keys = [
+                'build_automatically',
+                'task_id',
+                'ces_url',
+                'ces_token',
+                'certificate',
+                'srid',
+                'assignment_id',
+                'level',
+                'runtime_configuration',
+                'change_type',
+                'execution_status'
+            ];
+            const inputs = utils.retrieveInputs(core, keys);
+            core.debug('Code Pipeline: parsed inputs: ' + utils.convertObjectToJson(inputs));
+            let buildParms;
+            if (utils.stringHasContent(inputs.build_automatically)) {
+                console.log('Build parameters are being retrieved from the build_automatically input.');
+                buildParms = utils.parseStringAsJson(inputs.build_automatically);
+            }
+            else {
+                console.log('Build parameters are being retrieved from the inputs.');
+                buildParms = getParmsFromInputs(inputs.assignment_id, inputs.level, inputs.task_id);
+            }
+            core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
+            const reqPath = getBuildAwaitUrlPath(inputs.srid, buildParms, inputs.build_automatically);
+            const reqUrl = utils.assembleRequestUrl(inputs.ces_url, reqPath);
+            core.debug('Code Pipeline: request url: ' + reqUrl.href);
+            // getting host port details from srid passed
+            const hostAndPort = inputs.srid.split('-');
+            const host = hostAndPort[0];
+            const port = hostAndPort[1];
+            const reqBodyObj = assembleRequestBodyObject(inputs.runtime_configuration, inputs.change_type, inputs.execution_status);
+            core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj));
+            //processing the inputs if they are not retrieved from build_automatically
+            if (!utils.stringHasContent(inputs.build_automatically)) {
+                //Validating either taskIds or Assignment Ids with Level should be provided.
+                if (!utils.stringHasContent(buildParms.containerId) &&
+                    !utils.stringHasContent(buildParms.taskIds)) {
+                    throw new Error('Either Task IDs or Assignment ID with Level required for Code Pipeline Build. ');
+                }
+                //Validating the Level value if Assignment ID value is specified.
+                if (utils.stringHasContent(buildParms.containerId)) {
+                    if (!utils.stringHasContent(buildParms.taskLevel)) {
+                        throw new Error('Assignment ID and Level are mandatory for the Code Pipeline build');
                     }
-                    else {
-                        console.log('Build parameters are being retrieved from the inputs.');
-                        buildParms = getParmsFromInputs(inputs.assignment_id, inputs.level, inputs.task_id);
-                    }
-                    core.debug('Code Pipeline: parsed buildParms: ' + utils.convertObjectToJson(buildParms));
-                    reqPath = getBuildAwaitUrlPath(inputs.srid, buildParms, inputs.build_automatically);
-                    reqUrl = utils.assembleRequestUrl(inputs.ces_url, reqPath);
-                    core.debug('Code Pipeline: request url: ' + reqUrl.href);
-                    hostAndPort = inputs.srid.split('-');
-                    host = hostAndPort[0];
-                    port = hostAndPort[1];
-                    reqBodyObj = assembleRequestBodyObject(inputs.runtime_configuration, inputs.change_type, inputs.execution_status);
-                    core.debug('Code Pipeline: request body: ' + utils.convertObjectToJson(reqBodyObj));
-                    //processing the inputs if they are not retrieved from build_automatically
-                    if (!utils.stringHasContent(inputs.build_automatically)) {
-                        //Validating either taskIds or Assignment Ids with Level should be provided.
-                        if (!utils.stringHasContent(buildParms.containerId) &&
-                            !utils.stringHasContent(buildParms.taskIds)) {
-                            throw new Error('Either Task IDs or Assignment ID with Level required for Code Pipeline Build. ');
-                        }
-                        //Validating the Level value if Assignment ID value is specified.
-                        if (utils.stringHasContent(buildParms.containerId)) {
-                            if (!utils.stringHasContent(buildParms.taskLevel)) {
-                                throw new Error('Assignment ID and Level are mandatory for the Code Pipeline build');
-                            }
-                        }
-                        //If both assignment and taskIds are given, ignore taskIds
-                        if (utils.stringHasContent(buildParms.containerId) &&
-                            utils.stringHasContent(buildParms.taskIds)) {
-                            console.log('If both Assignment ID and Task IDs are provided, the specified Task IDs will be ignored, and the build will be executed for all tasks associated with the given Assignment ID');
-                            console.log('Starting the build process assignment ' +
-                                buildParms.containerId +
-                                ' at level ' +
-                                buildParms.taskLevel);
-                        }
-                        else {
-                            if (utils.stringHasContent(buildParms.containerId)) {
-                                console.log('Starting the build process assignment ' +
-                                    buildParms.containerId +
-                                    ' at level ' +
-                                    buildParms.taskLevel);
-                            }
-                            else {
-                                if (buildParms.taskIds && buildParms.taskIds.length > 0) {
-                                    console.log('Starting the build process for task ' + buildParms.taskIds.toString());
-                                }
-                            }
-                        }
+                }
+                //If both assignment and taskIds are given, ignore taskIds
+                if (utils.stringHasContent(buildParms.containerId) &&
+                    utils.stringHasContent(buildParms.taskIds)) {
+                    console.log('If both Assignment ID and Task IDs are provided, the specified Task IDs will be ignored, and the build will be executed for all tasks associated with the given Assignment ID');
+                    console.log('Starting the build process assignment ' +
+                        buildParms.containerId +
+                        ' at level ' +
+                        buildParms.taskLevel);
+                }
+                else {
+                    if (utils.stringHasContent(buildParms.containerId)) {
+                        console.log('Starting the build process assignment ' +
+                            buildParms.containerId +
+                            ' at level ' +
+                            buildParms.taskLevel);
                     }
                     else {
                         if (buildParms.taskIds && buildParms.taskIds.length > 0) {
                             console.log('Starting the build process for task ' + buildParms.taskIds.toString());
                         }
                     }
-                    if (!isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) return [3 /*break*/, 2];
-                    //for token
-                    console.log('Using ces_token as authentication method.');
-                    return [4 /*yield*/, utils
-                            .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
-                            .then(function (response) {
-                            core.debug('Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data));
-                            // build could have passed or failed
-                            setOutputs(response.data);
-                            return handleResponseBody(response.data);
-                        }, function (error) {
-                            // there was a problem with the request to CES
-                            if (error.response !== undefined) {
-                                core.debug('Code Pipeline: received error code: ' + error.response.status);
-                                core.debug('Code Pipeline: received error response body: ' +
-                                    utils.convertObjectToJson(error.response.data));
-                                setOutputs(error.response.data);
-                                if (error.response.data) {
-                                    throw new GenerateFailureException(error.response.data.message);
-                                }
-                                else {
-                                    throw new GenerateFailureException('There was a problem with the request to CES');
-                                }
-                            }
-                            throw error;
-                        })
-                            .then(function () { return console.log('The build request completed successfully.'); }, function (error) {
-                            core.debug(error.stack);
-                            core.setFailed(error.message);
-                        })];
-                case 1:
-                    _a.sent();
-                    return [3 /*break*/, 4];
-                case 2:
-                    //for certi
-                    console.log('Using certificate as authentication method.');
-                    return [4 /*yield*/, utils
-                            .getHttpPostPromiseWithCert(reqUrl, inputs.certificate, host, port, reqBodyObj)
-                            .then(function (response) {
-                            core.debug('Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data));
-                            // build could have passed or failed
-                            setOutputs(response.data);
-                            return handleResponseBody(response.data);
-                        }, function (error) {
-                            // there was a problem with the request to CES
-                            if (error.response !== undefined) {
-                                core.debug('Code Pipeline: received error code: ' + error.response.status);
-                                core.debug('Code Pipeline: received error response body: ' +
-                                    utils.convertObjectToJson(error.response.data));
-                                setOutputs(error.response.data);
-                                if (error.response.data) {
-                                    throw new GenerateFailureException(error.response.data.message);
-                                }
-                                else {
-                                    throw new GenerateFailureException('There was a problem with the request to CES');
-                                }
-                            }
-                            throw error;
-                        })
-                            .then(function () { return console.log('The build request completed successfully.'); }, function (error) {
-                            core.debug(error.stack);
-                            core.setFailed(error.message);
-                        })];
-                case 3:
-                    _a.sent();
-                    _a.label = 4;
-                case 4: return [3 /*break*/, 6];
-                case 5:
-                    error_1 = _a.sent();
-                    if (error_1 instanceof MissingArgumentException) {
-                        // this would occur if there was nothing to load during the sync process
-                        // no need to fail the action if the generate is never attempted
-                        console.log(error_1.message);
-                    }
-                    else {
-                        core.debug(error_1.stack);
-                        console.error('An error occurred while starting the build');
-                        core.setFailed(error_1.message);
-                    }
-                    return [3 /*break*/, 6];
-                case 6: return [2 /*return*/];
+                }
             }
-        });
+            else {
+                if (buildParms.taskIds && buildParms.taskIds.length > 0) {
+                    console.log('Starting the build process for task ' + buildParms.taskIds.toString());
+                }
+            }
+            if (isAuthTokenOrCerti(inputs.ces_token, inputs.certificate)) {
+                //for token
+                console.log('Using ces_token as authentication method.');
+                yield utils
+                    .getHttpPostPromise(reqUrl, inputs.ces_token, reqBodyObj)
+                    .then((response) => {
+                    core.debug('Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data));
+                    // build could have passed or failed
+                    setOutputs(response.data);
+                    return handleResponseBody(response.data);
+                }, (error) => {
+                    // there was a problem with the request to CES
+                    if (error.response !== undefined) {
+                        core.debug('Code Pipeline: received error code: ' + error.response.status);
+                        core.debug('Code Pipeline: received error response body: ' +
+                            utils.convertObjectToJson(error.response.data));
+                        setOutputs(error.response.data);
+                        if (error.response.data) {
+                            throw new GenerateFailureException(error.response.data.message);
+                        }
+                        else {
+                            throw new GenerateFailureException('There was a problem with the request to CES');
+                        }
+                    }
+                    throw error;
+                })
+                    .then(() => console.log('The build request completed successfully.'), (error) => {
+                    core.debug(error.stack);
+                    core.setFailed(error.message);
+                });
+            }
+            else {
+                //for certi
+                console.log('Using certificate as authentication method.');
+                yield utils
+                    .getHttpPostPromiseWithCert(reqUrl, inputs.certificate, host, port, reqBodyObj)
+                    .then((response) => {
+                    core.debug('Code Pipeline: received response body: ' + utils.convertObjectToJson(response.data));
+                    // build could have passed or failed
+                    setOutputs(response.data);
+                    return handleResponseBody(response.data);
+                }, (error) => {
+                    // there was a problem with the request to CES
+                    if (error.response !== undefined) {
+                        core.debug('Code Pipeline: received error code: ' + error.response.status);
+                        core.debug('Code Pipeline: received error response body: ' +
+                            utils.convertObjectToJson(error.response.data));
+                        setOutputs(error.response.data);
+                        if (error.response.data) {
+                            throw new GenerateFailureException(error.response.data.message);
+                        }
+                        else {
+                            throw new GenerateFailureException('There was a problem with the request to CES');
+                        }
+                    }
+                    throw error;
+                })
+                    .then(() => console.log('The build request completed successfully.'), (error) => {
+                    core.debug(error.stack);
+                    core.setFailed(error.message);
+                });
+            }
+        }
+        catch (error) {
+            if (error instanceof MissingArgumentException) {
+                // this would occur if there was nothing to load during the sync process
+                // no need to fail the action if the generate is never attempted
+                console.log(error.message);
+            }
+            else {
+                core.debug(error.stack);
+                console.error('An error occurred while starting the build');
+                core.setFailed(error.message);
+            }
+        }
     });
 }
 exports.run = run;
@@ -261,7 +208,7 @@ exports.run = run;
  * This will never return undefined.
  */
 function getParmsFromInputs(inputAssignment, inputLevel, inputTaskId) {
-    var buildParms = {};
+    const buildParms = {};
     if (utils.stringHasContent(inputAssignment)) {
         buildParms.containerId = inputAssignment;
     }
@@ -323,7 +270,7 @@ function setOutputs(responseBody) {
         core.setOutput('set_id', responseBody.setId);
         core.setOutput('url', responseBody.url);
         core.setOutput('assignment_id', responseBody.assignmentId);
-        var isTimedOut = utils.stringHasContent(responseBody.message) && responseBody.message.includes('timed out');
+        const isTimedOut = utils.stringHasContent(responseBody.message) && responseBody.message.includes('timed out');
         core.setOutput('is_timed_out', isTimedOut);
         if (responseBody.awaitStatus) {
             core.setOutput('generate_failed_count', responseBody.awaitStatus.generateFailedCount);
@@ -344,7 +291,7 @@ function setOutputs(responseBody) {
  * @return an CesRequestBody with all the fields for the request body filled in
  */
 function assembleRequestBodyObject(runtimeConfig, changeType, executionStatus) {
-    var requestBody = {};
+    const requestBody = {};
     if (utils.stringHasContent(runtimeConfig)) {
         requestBody.runtimeConfiguration = runtimeConfig;
     }
@@ -365,24 +312,24 @@ exports.assembleRequestBodyObject = assembleRequestBodyObject;
  * @return the request path which can be appended to the CES url
  */
 function getBuildAwaitUrlPath(srid, buildParms, build_automatically) {
-    var tempUrlStr = "/ispw/".concat(srid, "/build-await?");
+    let tempUrlStr = `/ispw/${srid}/build-await?`;
     if (utils.stringHasContent(build_automatically)) {
         if (buildParms.taskIds && buildParms.taskIds.length > 0) {
-            buildParms.taskIds.forEach(function (id) {
-                tempUrlStr = tempUrlStr.concat("taskId=".concat(id, "&"));
+            buildParms.taskIds.forEach(id => {
+                tempUrlStr = tempUrlStr.concat(`taskId=${id}&`);
             });
         }
     }
     else {
         if (utils.stringHasContent(buildParms.containerId) ||
             (utils.stringHasContent(buildParms.containerId) && utils.stringHasContent(buildParms.taskIds))) {
-            tempUrlStr = tempUrlStr.concat("assignmentId=".concat(buildParms.containerId, "&"));
-            tempUrlStr = tempUrlStr.concat("level=".concat(buildParms.taskLevel, "&"));
+            tempUrlStr = tempUrlStr.concat(`assignmentId=${buildParms.containerId}&`);
+            tempUrlStr = tempUrlStr.concat(`level=${buildParms.taskLevel}&`);
         }
         else {
             if (buildParms.taskIds && buildParms.taskIds.length > 0) {
-                buildParms.taskIds.forEach(function (id) {
-                    tempUrlStr = tempUrlStr.concat("taskId=".concat(id, "&"));
+                buildParms.taskIds.forEach(id => {
+                    tempUrlStr = tempUrlStr.concat(`taskId=${id}&`);
                 });
             }
         }
@@ -416,16 +363,13 @@ exports.isAuthTokenOrCerti = isAuthTokenOrCerti;
  *
  * @param message the message associated with the error
  */
-var MissingArgumentException = /** @class */ (function (_super) {
-    __extends(MissingArgumentException, _super);
-    function MissingArgumentException(message) {
-        var _this = _super.call(this, message) || this;
-        Object.setPrototypeOf(_this, MissingArgumentException.prototype);
-        _this.name = 'MissingArgumentException';
-        return _this;
+class MissingArgumentException extends Error {
+    constructor(message) {
+        super(message);
+        Object.setPrototypeOf(this, MissingArgumentException.prototype);
+        this.name = 'MissingArgumentException';
     }
-    return MissingArgumentException;
-}(Error));
+}
 exports.MissingArgumentException = MissingArgumentException;
 /**
  * Error to throw when the response for the generate request is incomplete
@@ -433,15 +377,12 @@ exports.MissingArgumentException = MissingArgumentException;
  *
  * @param message the message associated with the error
  */
-var GenerateFailureException = /** @class */ (function (_super) {
-    __extends(GenerateFailureException, _super);
-    function GenerateFailureException(message) {
-        var _this = _super.call(this, message) || this;
-        Object.setPrototypeOf(_this, GenerateFailureException.prototype);
-        _this.name = 'GenerateFailureException';
-        return _this;
+class GenerateFailureException extends Error {
+    constructor(message) {
+        super(message);
+        Object.setPrototypeOf(this, GenerateFailureException.prototype);
+        this.name = 'GenerateFailureException';
     }
-    return GenerateFailureException;
-}(Error));
+}
 exports.GenerateFailureException = GenerateFailureException;
 //# sourceMappingURL=main.js.map
