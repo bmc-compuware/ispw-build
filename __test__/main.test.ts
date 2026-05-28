@@ -8,6 +8,18 @@
 import {CesRequestBody} from '../src/types/CesRequestBody'
 import {BuildParms} from '../src/types/BuildParms'
 import {Inputs} from '../src/types/Inputs'
+
+jest.mock('@bmc-compuware/ispw-action-utilities', () => ({
+  retrieveInputs: jest.fn(),
+  convertObjectToJson: jest.fn((obj: any) => JSON.stringify(obj)),
+  stringHasContent: jest.fn((str: any) => str !== null && str !== undefined && str.length !== 0),
+  parseStringAsJson: jest.fn((str: any) => JSON.parse(str)),
+  assembleRequestUrl: jest.fn(),
+  getHttpPostPromise: jest.fn(),
+  getHttpPostPromiseWithCert: jest.fn(),
+  getStatusMessageToPrint: jest.fn((msg: any) => msg)
+}))
+
 const main = require('../src/main')
 
 describe('entity tests', () => {

@@ -8,6 +8,6 @@
  * This code is licensed under MIT license (see LICENSE.txt for details)
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var main_1 = require("./main");
+const main_1 = require("./main");
 (0, main_1.run)();
 //# sourceMappingURL=ispw-build.js.map
