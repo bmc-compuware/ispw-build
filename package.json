@@ -38,7 +38,7 @@
     "@actions/github": "^6.0.0",
     "@bmc-compuware/ispw-action-utilities": "github:bmc-compuware/ispw-action-utilities",
     "@types/lodash": "^4.17.4",
-    "axios": "^1.15.2",
+    "axios": "^1.21.1",
     "path": "^0.12.7"
   },
   "devDependencies": {
